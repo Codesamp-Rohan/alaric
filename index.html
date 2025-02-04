@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="./style.css">
+  <script type='module' src='./app.js'></script>
+  <script type="module" src="./local.js"></script>
+  <script type="module" src="./page.js"></script>
+  <script type="module" src="./notification.js"></script>
+</head>
+<body>
+  <div id="bar"><pear-ctrl></pear-ctrl></div>
+  <div class="blob1"></div>
+  <div class="blob2"></div>
+  <p class="version">Build V1.0.1</p>
+  <main>
+    <div class="notification">
+      <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 10px;">
+        <img class="notification-icon" />
+        <p class="notification-type"></p>
+      </div>
+      <p class="notification-message"></p>
+    </div>
+    <section class="sideMenu">
+      <h1>PearMaze</h1>
+      <div style="display: flex; flex-direction: column; justify-content: space-between; width: 100%; height: 93%;">
+      <ul style="margin-top: 2rem;">
+        <li><span class="dot dot-hide"></span><img src="./assets/pin.png" class="icon" /><p>Pinned Apps</p>
+          <p id="pinned-apps-no">0</p></li>
+        <li><span class="dot dot-hide"></span><img src="./assets/local.png" class="icon" /><p>Local System Apps</p>
+          <p id="local-apps-no">0</p></li>
+        <li><span class="dot dot-hide"></span><img src="./assets/global.png" class="icon" /><p>Global Apps</p>
+          <p id="global-apps-no">0</p></li>
+          <li><span class="dot dot-hide"></span><img src="./assets/og.png" class="icon" /><p>OnlyGames</p>
+            <p id="onlyGames-apps-no">0</p></li>
+        <li><span class="dot dot-hide"></span><img src="./assets/add.png" class="icon" /><p>Add App</p></li>
+        <li><span class="dot dot-hide"></span><img src="./assets/my.png" class="icon" /><p>Personal Apps</p>
+          <p id="personal-apps-no">0</p></li>
+      </ul>
+      <ul>
+        <li class="active"><span class="dot dot-hide"></span><img src="./assets/alertMsg.png" class="icon" /><p>Alert Message</p></li>
+      <li class="active"><span class="dot dot-hide"></span><img src="./assets/pear.png" class="icon" /><p>About the Creator</p></li>
+      </ul>
+      </div>  
+    </section>
+    <div class="data--area">
+      <div class="overlay hide"></div>
+      <!-- Pinned Apps -->
+      <section class="page" id="pinned--page">
+        <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999;">
+          <p class="page--header">Your Pinned Apps</p>
+          </div>
+      </section>
+      <!-- Local Apps -->
+      <section class="page hide" id="local--page">
+        <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999; background-color: #fff;">
+          <p class="page--header">Your Local Pear Apps</p>
+          <button class="clear-cacheBtn">CLEAR CACHE</button>
+          </div>
+          <div class="loader">
+            <svg viewBox="25 25 50 50">
+              <circle r="20" cy="50" cx="50"></circle>
+            </svg>
+            <!-- <p>Loading, great things take time.</p> -->
+          </div>
+          <div class="message hide" style="color: red; font-size: 40px; font-weight: 900;">Error in retrieving the data.</div>
+          <div class="list--area">
+          </div>
+      </section>
+      <!-- Global Apps -->
+      <section class="page hide" id="global--page">
+        <div id="global--popUp" class="hide">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <p style="font-size: 10px; color: #bbb;">PopUp</p>
+            <button class="button" style="width: fit-content; margin-top: 0;" id="close-global--popUp">close</button>
+          </div>
+          <div id="popUp--pearContent"></div>
+        </div>
+        <div  style="display: flex;flex-direction: row;justify-content: space-between;align-items: center;width: 100%;position: sticky;top: 0;z-index: 99;background-color: #fff;">
+          <p class="page--header">Global Apps</p>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <input type="text" style="margin-top: 0;border-radius: 5px;padding: 10px; width: 160px;" id="global--search" placeholder="Search the App" />
+          <div class="dropdown">
+            <button class="dropbtn"><img src="./assets/sort.png" style="width: 8px;" />Sort By</button>
+            <div class="dropdown-content">
+              <a href="#" id="sortByOldest"><img src="./assets/oldest.png" style="width: 10px;" />Oldest</a>
+              <a href="#" id="sortByName"><img src="./assets/name.png" style="width: 10px;" />Name</a>
+              <a href="#" id="sortByNewest"><img src="./assets/newest.png" style="width: 10px;" />Newest</a>
+            </div>
+          </div>         
+          <button class="button" id="reload--app" style="width: fit-content;font-size: 10px;font-weight: 900;margin-top: 0; color: #fff; background-color: #000;border-radius: 5px;">Reload App</button>
+          </div>
+          </div>
+          <div class="list--area"></div>
+      </section>
+      <!-- Only Games -->
+      <section class="page" id="onlyGames--page">
+        <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999;">
+          <p class="page--header">Only Games using Holesail</p>
+          </div>
+          <div class="list--area">
+            <p>Only Games coming SOON!!!</p>
+          </div>
+      </section>
+      <!-- Add App Form -->
+      <section class="page hide" id="add--page">
+        <div  style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999;">
+          <p class="page--header">Add App Form</p>
+          </div>
+          <form>
+            <label>Name of the App*</label>
+            <input required type="text" name="app-name" id="app-name" placeholder="Eg: Keet">
+            <label style="margin-top: 1rem;">Upload Logo</label>
+            <input type="file" name="app-image" id="app-image" placeholder="Upload an image">
+            <label style="margin-top: 1rem;">Add run command*<br/>
+              <span style="color: rgb(0, 128, 255); font-size: 8px; font-weight: 900;">Please add the complete command</span>
+            </label>
+            <input required type="text" name="app-cmd" id="app-cmd" placeholder="Eg: holesail <connection-string>">
+              <div style="display: flex; justify-content: space-between; position: relative; align-items: flex-end;">
+              <label style="margin-top: 1rem;">App Description*</label>
+              <p class="char-count" id="charCount">0/70</p>
+              </div>
+              <textarea type="text" name="app-description" id="app-description" placeholder="Write the description of app."></textarea>
+              <label style="margin-top: 1rem;">Choose Type*</label>
+              <select id="app-type" name="app-type" required>
+                <option value="pear">Pear</option>
+                <option value="terminal">Terminal</option>
+                <option value="holesail">Holesail</option>
+                <option value="other">Other</option>
+              </select>
+            <button type="button" id="submit-btn" class="button">Submit</button>
+          </form>
+          <!-- <div style="position: fixed;top: 76%;right: -4.5%;transform: translate(-50%, -50%);color: #ff000085;font-weight: bolder;padding: 10px;background: #8b000017;border: 1px solid;border-radius: 5px;">
+            <p>Please enter every detail carefully. Do not play around.</p>
+          </div> -->
+      </section>
+      <!-- Personal Apps -->
+      <section class="page" id="personal--page">
+        <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999;">
+          <p class="page--header">Apps added by You 🫵</p>
+          </div>
+          <div class="list--area" style="overflow: visible !important;"></div>
+      </section>
+         <!-- Important Message -->
+         <section class="page hide" id="aboutMe--page" style="padding-bottom: 1rem;">
+          <div  style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999;">
+          <p class="page--header" style="background-color: #fff;">
+            <!-- 👉️ All Important points are here 👈️</p> -->
+            📜 Rules & Important Messages – pearMaze</p>
+          </div>
+          <div style="margin: 1rem;">
+            <h1 style="margin: 10px;"><strong>🚀 Welcome to pearMaze!</strong></h1>
+            <p style="margin-left: 3rem;">pearMaze is a decentralized platform that allows seamless sharing and discovery of peer-to-peer applications. To ensure a smooth experience for all users, please follow these guidelines:</p>
+            <h1 style="margin: 10px;"><strong>📌 General Rules:</strong></h1>
+            <div style="display: flex; flex-direction: column; gap: 6px; margin-left: 3rem;">
+            <p><strong>1. Respect Privacy & Security</strong> – Do not share sensitive information publicly. Ensure that the apps you use or share are safe.</p>
+            <p><strong>2. No Malicious Content</strong> – Avoid adding or running apps that contain harmful code, malware, or unethical scripts.</p>
+            <p><strong>3. Fair Usage</strong> – Do not spam or overload the network with excessive data requests or unnecessary apps.</p>
+            <p><strong>4. P2P Ethics</strong> – Since pearMaze relies on P2P networks, be mindful of what you share and respect others' bandwidth and resources.</p>
+            <p><strong>5. Open Source & Transparency</strong> – If you share an app, consider providing a clear description and repository link for transparency.</p>
+            </div>
+            <h1 style="margin: 10px;"><strong>⚠️ Important Notes:</strong></h1>
+            <div style="display: flex; flex-direction: column; gap: 6px; margin-left: 3rem;">
+            <p><strong>1. Data Storage</strong> – pearMaze caches app data for faster loading. If you face any issues, try clearing the cache or restarting the app.</p>
+            <p><strong>2. Global App Section</strong> – This is a shared space; apps added here will be visible to all connected peers.</p>
+            <p><strong>3. Fair Usage</strong> – Do not spam or overload the network with excessive data requests or unnecessary apps.</p>
+            <p><strong>4. P2P Ethics</strong> – Since pearMaze relies on P2P networks, be mindful of what you share and respect others' bandwidth and resources.</p>
+            <p><strong>5. Open Source & Transparency</strong> – If you share an app, consider providing a clear description and repository link for transparency.</p>
+            </div>
+            <h1><strong>📞 Need Help?</strong></h1>
+            <p style="margin-left: 3rem;">
+              If you encounter any issues or have feedback, feel free to reach out via <strong><a href="mailto:rohanchaudhary.bkbiet2022@gmail.com">rohanchaudhary.bkbiet2022@gmail.com</a></strong>
+              
+              Happy sharing! 🚀</p>
+          </div>
+        </section>
+      <!-- About ME -->
+      <section class="page hide" id="aboutMe--page" style="padding-bottom: 1rem;">
+        <div  style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999;">
+        <p class="page--header">Creator</p>
+        </div>
+        <h1 style="font-weight: 900; font-size: 2rem; margin-top: 1.6rem;"><span style="color: #bbb;">About Me, </span></br>I'm a <span style="text-decoration: underline; font-style: italic;">Front-End biased Developer</span> living in India.</h1>
+        <img style="width: 100%; height: 40vh; object-fit: cover; border-radius: 10px;" src="./assets/me.jpeg" />
+        <p style="margin-top: 2rem;"> Hi, I'm Rohan, a passionate developer specializing myself in P2P apps and front-end design and development. I love creating innovative solutions and design. My goal is to make beautiful and functional apps that connect people in meaningful ways. When I'm not coding, I enjoy exploring new ideas and learning more about design and technology.</p>
+            <ul class="social--links" style="margin-top: 0.6rem;">
+              <a href="https://github.com/Codesamp-Rohan" target="_blank" class="active"><img src="./assets/github.png" class="icon" /><p>GitHub</p></a>
+              <a href="https://www.linkedin.com/in/rohan-chaudhary-399742255/" target="_blank" class="active"><img src="./assets/linkedin.png" class="icon" /><p>LinkedIn</p></a>
+              <a href="mailto:rohanchaudhary.bkbiet2022@gmail.com" class="active"><img src="./assets/mail.png" class="icon" /><p>G-Mail</p></a>
+            </ul>
+            <ul class="social--links">
+            <a class="active" style="width: fit-content; margin-top: 10px;"><img src="./assets/instagram.png" class="icon" /><p>Instagram</p></a>
+            <a href="https://codesamprohan.me" target="_blank" class="active" style="width: fit-content; margin-top: 10px;"><img src="./assets/portfolio.png" class="icon" /><p>Portfolio</p></a>
+            </ul>
+      </section>
+      <!-- Home Page -->
+      <section class="page" id="home--page">
+        <div  style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999;">
+          <p class="page--header">Hey there, How are you doing???</p>
+          </div>
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; gap: 20px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+            <img style="width: 20%; object-fit: cover; border-radius: 10px;" src="./assets/pear.svg" />
+            <h1>Welcome Back Pear!!!</h1>
+            <p>Select any side-menu option to get started.</p>
+          </div>
+      </section>
+    </div>
+  </main>
+</body>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+  const pearImage = document.querySelector("img[src='./assets/pear.svg']");
+  
+  pearImage.style.transition = "transform 0.1s ease-out";
+
+  document.addEventListener("mousemove", (event) => {
+    const rect = pearImage.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+
+    const offsetX = (event.clientX - centerX) / 10;
+    const offsetY = (event.clientY - centerY) / 10;
+
+    pearImage.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+  });
+
+  document.addEventListener("mouseleave", () => {
+    pearImage.style.transform = "translate(0, 0)";
+  });
+});
+
+</script>
+</html>

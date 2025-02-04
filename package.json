@@ -1,0 +1,39 @@
+{
+  "name": "hypermaze",
+  "main": "index.html",
+  "pear": {
+    "name": "hypermaze",
+    "type": "desktop",
+    "gui": {
+      "backgroundColor": "#1F2430",
+      "height": "800",
+      "width": "1040"
+    },
+    "links": [ 
+      "https://cdn.jsdelivr.net/npm/xterm/css/xterm.css"
+    ]
+  },
+  "type": "module",
+  "license": "Apache-2.0",
+  "scripts": {
+    "dev": "pear run -d .",
+    "test": "brittle test/*.test.js"
+  },
+  "devDependencies": {
+    "brittle": "^3.0.0",
+    "pear-interface": "^1.0.0"
+  },
+  "dependencies": {
+    "@xterm/xterm": "^5.5.0",
+    "autopass": "^1.0.2",
+    "b4a": "^1.6.7",
+    "bare-path": "^3.0.0",
+    "bare-process": "^4.0.0",
+    "corestore": "^6.18.4",
+    "hypercore": "^10.38.2",
+    "hypercore-crypto": "^3.4.2",
+    "hyperswarm": "^4.8.4",
+    "xterm": "^5.3.0",
+    "xterm-addon-fit": "^0.8.0"
+  }
+}
