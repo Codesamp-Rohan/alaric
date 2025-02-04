@@ -117,7 +117,6 @@ const listProducts = async () => {
                  <p style="font-size: 9px; font-weight: 900; color: #247538; white-space: nowrap;">${formatDate(app.createAt)}</p>
               </div>
               <p style="font-weight: 100; color: #777; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%; font-size: 14px;">${app.appDescription ? app.appDescription : cmd}</p>
-               <p style="font-weight: 100; color: #777; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%; font-size: 10px;">${cmd}</p>
             </div>
           </div>
           <div class="list--side--menu">
@@ -136,6 +135,9 @@ const listProducts = async () => {
     })
     .join('');
 
+    // <p style="font-weight: 100; color: #777; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%; font-size: 10px;">${cmd}</p>
+
+
   document.querySelectorAll('.app-item').forEach(item => {
     item.addEventListener('click', (event) => {
       if (!event.target.closest('.list--side--menu')) {
@@ -147,6 +149,25 @@ const listProducts = async () => {
       }
     });
   })
+  document.querySelectorAll('.copy-pearID').forEach(button => {
+    button.addEventListener('click', (event) => {
+      const parentItem = event.currentTarget.closest('.app-item'); 
+      const pearCmd = parentItem?.getAttribute('data-cmd'); 
+  
+      if (pearCmd) {
+        navigator.clipboard.writeText(pearCmd).then(() => {
+          notification('Command copied to clipboard.', 'success');
+        }).catch(err => {
+          notification('Failed to copy command.', 'error');
+          console.error('Clipboard copy error:', err);
+        });
+      } else {
+        notification('No command found.', 'error');
+      }
+    });
+  });
+  
+  
   document.querySelectorAll('.run-cmd').forEach(button => {
     button.addEventListener('click', (e) => {
       const parentItem = button.closest('.app-item');
@@ -456,7 +477,7 @@ const listPersonalApps = async () => {
               style="padding: 7px;border-radius: 13px;border: 0;width: 160%;height: 130%;position: absolute;top: 50%;right: 0;transform: translateY(-61%);" 
               src="${app.logo || './assets/pear.svg'}" 
               alt="App Logo"/>
-            <div style="width: 100%; display: flex; flex-direction: column;align-items: center; position: absolute; bottom: 0; background: linear-gradient(0deg, rgb(0 0 0) 0%, rgb(0 0 0) 19%, rgb(0 0 0 / 41%) 75%, rgba(255, 255, 255, 0) 100%);padding: 1rem; backdrop-filter: blur(20px);">
+            <div style="width: 100%; display: flex; flex-direction: column;align-items: flex-start; position: absolute; bottom: 0; background: linear-gradient(0deg, rgb(0 0 0) 0%, rgb(0 0 0) 19%, rgb(0 0 0 / 41%) 75%, rgba(255, 255, 255, 0) 100%);padding: 1rem; backdrop-filter: blur(20px);">
             <p style="color: #fff; font-size: 12px; font-weight: 900;"><strong>${app.name}</strong></p>
             <div style="display: flex; gap: 3px; align-items: center;">
                 <p style="font-size: 8px; font-weight: 900; color:#61ff88; white-space: nowrap;">${app.appType}</p>
@@ -492,34 +513,55 @@ const openPopup = (app) => {
   const popup = document.getElementById('global--popUp');
   const overlay = document.querySelector('.overlay');
   const popupContent = document.getElementById('popUp--pearContent');
-  const closePopUp = document.getElementById('close-global--popUp');
 
   popup.classList.toggle('hide');
   overlay.classList.remove('hide');
 
   popupContent.innerHTML = `
-  <div style="display: flex; gap: 4px; align-items: center; margin-block: 1rem;">
-  <img style="box-shadow: inset 0 0 13px #ddd;height: 60px; min-width: 60px; width: 60px; padding: 7px; background: #000; border-radius: 13px; border: 0;" src="${app.logo || './assets/pear.svg'}" alt="App Logo"/>
-  <div style="display: flex; flex-direction: column; gap: 4px;">
-  <div style="display: flex; gap: 4px; align-items: center;">
-  <h2 class="popUp--name">${app.name}</h2>
-  <p>${app.appType}</p>
-  <p>${formatDate(app.createAt)}</p>
-  </div>
-  <p>${app.appDescription || "No description available"}</p>
-  </div>
-  </div>
-  <p><strong>Command:</strong> ${app.cmd}</p>
+    <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 1rem;">
+      <img style="box-shadow: inset 0 0 13px #ddd;height: 60px; min-width: 60px; width: 60px; padding: 7px; background: #000; border-radius: 13px; border: 0;" src="${app.logo || './assets/pear.svg'}" alt="App Logo"/>
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <div style="display: flex; gap: 4px; align-items: center;">
+          <h2 class="popUp--name">${app.name}</h2>
+          <p>${app.appType}</p>
+          <p>${formatDate(app.createAt)}</p>
+        </div>
+        <p>${app.appDescription || "No description available"}</p>
+      </div>
+    </div>
+    <p style="overflow-wrap: break-word;width: 360px;"><strong>Command:</strong> <span id="appCommand">${app.cmd}</span></p>
+
+    <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 1rem;">
+      <button class="button" id="run-command-btn" style="padding: 8px 15px; border: none; background:#ac0009; color: #fff; border-radius: 5px; cursor: pointer; margin-top: 0; box-shadow: inset 0 0 11px #FFF">Run</button>
+      <button class="button" id="copy-command-btn" style="padding: 8px 15px; border: none; background: #00236e; color: #fff; border-radius: 5px; cursor: pointer; margin-top: 0; box-shadow: inset 0 0 11px #FFF">Copy</button>
+      <button class="button" style="margin-top: 0; width: fit-content;" id="close-global--popUp">Close</button>
+    </div>
   `;
 
-  closePopUp.addEventListener('click', () => {
-    document.getElementById('global--popUp').classList.add('hide');
-    const overlay = document.querySelector('.overlay');
+  // Close popup
+  document.getElementById('close-global--popUp').addEventListener('click', () => {
+    popup.classList.add('hide');
     overlay.classList.add('hide');
-  })
+  });
+
   overlay.addEventListener('click', () => {
-    document.getElementById('global--popUp').classList.add('hide');
-    const overlay = document.querySelector('.overlay');
+    popup.classList.add('hide');
     overlay.classList.add('hide');
-  })
+  });
+
+  // Run command button
+  document.getElementById('run-command-btn').addEventListener('click', () => {
+    runPearCommand(app.cmd);
+  });
+
+  // Copy command button
+  document.getElementById('copy-command-btn').addEventListener('click', () => {
+    navigator.clipboard.writeText(app.cmd).then(() => {
+      notification('Command copied to clipboard.', 'success');
+    }).catch(err => {
+      notification('Failed to copy command.', 'error');
+      console.error('Clipboard copy error:', err);
+    });
+  });
 };
+

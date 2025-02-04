@@ -69,10 +69,10 @@
       <!-- Global Apps -->
       <section class="page hide" id="global--page">
         <div id="global--popUp" class="hide">
-          <div style="display: flex; align-items: center; justify-content: space-between;">
-            <p style="font-size: 10px; color: #bbb;">PopUp</p>
-            <button class="button" style="width: fit-content; margin-top: 0;" id="close-global--popUp">close</button>
-          </div>
+          <!-- <div style="display: flex; align-items: center; justify-content: space-between;"> -->
+            <!-- <p style="font-size: 10px; color: #bbb;">PopUp</p> -->
+            <!-- <button class="button" style="width: fit-content; margin-top: 0;" id="close-global--popUp">close</button> -->
+          <!-- </div> -->
           <div id="popUp--pearContent"></div>
         </div>
         <div  style="display: flex;flex-direction: row;justify-content: space-between;align-items: center;width: 100%;position: sticky;top: 0;z-index: 99;background-color: #fff;">
@@ -120,6 +120,8 @@
               <p class="char-count" id="charCount">0/70</p>
               </div>
               <textarea type="text" name="app-description" id="app-description" placeholder="Write the description of app."></textarea>
+              <label style="margin-top: 1rem;">App Link</label>
+              <input type="url" name="app-link" id="app-link" placeholder="Eg: https://github.com/Codesamp-Rohan">
               <label style="margin-top: 1rem;">Choose Type*</label>
               <select id="app-type" name="app-type" required>
                 <option value="pear">Pear</option>
