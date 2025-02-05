@@ -19,7 +19,12 @@ let feed = new Hypercore(Pear.config.storage + './mazeData1', {
 let personalAppFeed = new Hypercore(Pear.config.storage + './personalApp', {
   valueEncoding: 'json'
 });
-
+// let feed = new Hypercore(Pear.config.storage + './hyperMazeData', {
+//   valueEncoding: 'json',
+// });
+// let personalAppFeed = new Hypercore(Pear.config.storage + './hyperMazeData/personalApp1', {
+//   valueEncoding: 'json'
+// });
 const globalApps = new Map();
 const personalApps = new Map();
 
@@ -75,10 +80,14 @@ const listProducts = async () => {
   }
 
   const globalAppsSection = document.querySelector('#global--page .list--area');
-  document.querySelector('#global-apps-no').innerHTML = Array.from(globalApps.values()).length;
+  const globalRoomSection = document.querySelector('#room--page .list--area');
+  document.querySelector('#global-apps-no').innerHTML = Array.from(globalApps.values()).filter(app => app.appType !== 'room').length;
+  document.querySelector('#rooms-apps-no').innerHTML = Array.from(globalApps.values()).filter(app => app.appType === 'room').length;
   const searchTerm = document.getElementById('global--search').value.trim().toLowerCase();
 
-  let appsToDisplay = Array.from(globalApps.values());
+  let appsToDisplay = Array.from(globalApps.values()).filter(app => app.appType !== 'room');
+  let roomsToDisplay = Array.from(globalApps.values()).filter(app => app.appType === 'room');
+
   if (searchTerm) {
     appsToDisplay = appsToDisplay.filter(app => 
       app.name.toLowerCase().includes(searchTerm) || app.cmd.toLowerCase().includes(searchTerm)
@@ -97,12 +106,49 @@ const listProducts = async () => {
     return 0;
   });
 
+  globalRoomSection.innerHTML = roomsToDisplay.map(app => {
+    return `
+     <div style="position: relative; cursor: pointer;" class="app-item reveal" data-cmd="${app.cmd}" data-id="${app.id}" id="${app.id}">
+          <div class="global-list-leftContent" style="display: flex; flex-direction: row; align-items: center; gap: 10px;">
+            <div class="list--running hide"></div>
+            <img 
+              style="box-shadow: inset 0 0 13px #ddd;height: 60px; min-width: 60px; width: 60px; padding: 7px; background: #000; border-radius: 13px; border: 0;" 
+              src="${app.logo || './assets/pear.svg'}" 
+              alt="App Logo"/>
+            <div style="width: 100%; display: flex; flex-direction: column;">
+              <div style="display: flex; gap: 10px; align-items: center;">
+                <p style="color: #333; font-size: 18px; font-weight: 900;"><strong>${app.name}</strong></p>
+                <p style="font-size: 11px; font-weight: 900; color: #247538; white-space: nowrap;">${app.appType}</p>
+                  <p style="font-size: 11px; font-weight: 900; color: #247538; white-space: nowrap;">|</p>
+                 <p style="font-size: 9px; font-weight: 900; color: #247538; white-space: nowrap;">${formatDate(app.createAt)}</p>
+              </div>
+              <p style="font-weight: 100; color: #777; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%; font-size: 14px;">${app.appDescription ? app.appDescription : cmd}</p>
+            </div>
+          </div>
+          <div class="list--side--menu">
+            <button class="slide-menu" style="background: transparent; border: 0; width: 30px; height: 30px;">
+              <img style="width: 12px;" src="./assets/arrow.png" class="list--icon icon" />
+            </button>
+            <button class="${['holesail', 'terminal'].includes(app.appType) ? 'openholesailPopUp' : 'run-cmd'}"
+        data-tooltip="Run the Pear app" 
+        style="background: transparent; border: 0; width: 30px; height: 30px;">
+
+              <img style="width: 15px;" src="./assets/run.png" class="list--icon icon" />
+            </button>
+            <button class="copy-pearID" data-tooltip="Copy Pear ID" style="background: transparent; border: 0; width: 30px; height: 30px;">
+              <img style="width: 15px;" src="./assets/copy.png" class="list--icon icon" />
+            </button>
+          </div>
+        </div>
+        `
+  }).join('');
+
   globalAppsSection.innerHTML = appsToDisplay.map(app => {
       const name = searchTerm ? highlightSearchTerm(app.name, searchTerm) : app.name;
       const cmd = searchTerm ? highlightSearchTerm(app.cmd, searchTerm) : app.cmd;
 
       return `
-        <div style="position: relative; cursor: pointer;" class="app-item reveal" data-cmd="${app.cmd}" data-id="${app.id}" id="${app.appId}">
+        <div style="position: relative; cursor: pointer;" class="app-item reveal" data-cmd="${app.cmd}" data-id="${app.id}" id="${app.id}">
           <div class="global-list-leftContent" style="display: flex; flex-direction: row; align-items: center; gap: 10px;">
             <div class="list--running hide"></div>
             <img 
@@ -123,7 +169,9 @@ const listProducts = async () => {
             <button class="slide-menu" style="background: transparent; border: 0; width: 30px; height: 30px;">
               <img style="width: 12px;" src="./assets/arrow.png" class="list--icon icon" />
             </button>
-            <button class="${app.appType === 'holesail' ? 'openholesailPopUp' : 'run-cmd'}" data-tooltip="Run the Pear app" style="background: transparent; border: 0; width: 30px; height: 30px;">
+                    <button class="${['holesail', 'terminal'].includes(app.appType) ? 'openholesailPopUp' : 'run-cmd'}"
+        data-tooltip="Run the Pear app" 
+        style="background: transparent; border: 0; width: 30px; height: 30px;">
               <img style="width: 15px;" src="./assets/run.png" class="list--icon icon" />
             </button>
             <button class="copy-pearID" data-tooltip="Copy Pear ID" style="background: transparent; border: 0; width: 30px; height: 30px;">
@@ -319,21 +367,33 @@ const addApp = async () => {
   };
 
   const processLogo = async () => {
-    if (appLogo) {
-      return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.readAsDataURL(appLogo);
-      });
+    if(appType !== 'room'){
+      if (appLogo) {
+        return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.readAsDataURL(appLogo);
+        });
+      } else {
+        return await getDefaultLogoBase64('./assets/pear.svg');
+      }
     } else {
-      return await getDefaultLogoBase64('./assets/pear.svg');
+      if (appLogo) {
+        return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.readAsDataURL(appLogo);
+        });
+      } else {
+        return await getDefaultLogoBase64('./assets/keet.png');
+      }
     }
   };
 
   const logoBase64 = await processLogo();
 
   const appData = {
-    type: 'appData',
+    type: 'app-data',
     id: generateId(),
     name: appName,
     createAt: Date.now(),
@@ -459,11 +519,11 @@ const listPersonalApps = async () => {
   for await (const app of personalAppFeed.createReadStream()) {
     if (!personalApps.has(app.id)) {
       personalApps.set(app.id, app);
-      console.log(app);
+      // console.log(app);
     }
   }
 
-  const personalAppsSection = document.querySelector('#personal--page .list--area');
+  const personalAppsSection = document.querySelector('#personal--page .personal--list--area');
   document.querySelector('#personal-apps-no').innerHTML = personalApps.size;
 
   if (personalApps.size === 0) {
@@ -471,13 +531,14 @@ const listPersonalApps = async () => {
   } else {
   personalAppsSection.innerHTML = Array.from(personalApps.values())
     .map(app => `
-        <div style="position: relative; cursor: pointer; width: 20%;height: 180px;border-radius: 20px; background-color: #000; box-shadow: 0 0 10px #bbb; overflow: hidden; box-shadow: 6px 7px 10px #a5a5a5;" class="app-item reveal" data-cmd="${app.cmd}" data-id="${app.id}" id="${app.appId}">
-          <div class="global-list-leftContent" style="display: flex;flex-direction: column;align-items: center;gap: 10px;position: relative;background-color: #000000;width: 100%;height: 100%;box-shadow: inset 0 0 30px #ddd;">
+        <div style="position: relative; cursor: pointer; width: 20%;height: 180px;border-radius: 20px; background-color: #000; box-shadow: 0 0 10px #bbb; overflow: hidden; box-shadow: 6px 7px 10px #a5a5a5;" class="personal-app-item reveal" data-cmd="${app.cmd}" data-id="${app.id}" id="${app.appId}">
+          <div class="personal-list" style="display: flex;flex-direction: column;align-items: center;gap: 10px;position: relative;background-color: #000000;width: 100%;height: 100%;box-shadow: inset 0 0 30px #ddd;">
             <img 
-              style="padding: 7px;border-radius: 13px;border: 0;width: 160%;height: 130%;position: absolute;top: 50%;right: 0;transform: translateY(-61%);" 
+              style="transition: 300ms;padding: 7px;border-radius: 13px;border: 0;width: 160%;height: 130%;position: absolute;top: 50%;right: 0;filter: blur(7px);transform: translateY(-61%);" 
               src="${app.logo || './assets/pear.svg'}" 
               alt="App Logo"/>
-            <div style="width: 100%; display: flex; flex-direction: column;align-items: flex-start; position: absolute; bottom: 0; background: linear-gradient(0deg, rgb(0 0 0) 0%, rgb(0 0 0) 19%, rgb(0 0 0 / 41%) 75%, rgba(255, 255, 255, 0) 100%);padding: 1rem; backdrop-filter: blur(20px);">
+            <div style="width: 100%;display: flex;flex-direction: column;position: absolute;
+    bottom: 0;height: 100%;background: linear-gradient(0deg, rgb(0 0 0) 0%, rgb(0 0 0) 19%, rgb(0 0 0 / 0%) 75%, rgba(255, 255, 255, 0) 100%);padding: 1.5rem 1rem;justify-content: flex-end;">
             <p style="color: #fff; font-size: 12px; font-weight: 900;"><strong>${app.name}</strong></p>
             <div style="display: flex; gap: 3px; align-items: center;">
                 <p style="font-size: 8px; font-weight: 900; color:#61ff88; white-space: nowrap;">${app.appType}</p>
@@ -565,3 +626,33 @@ const openPopup = (app) => {
   });
 };
 
+// Trending Apps
+const displayTrendingApps = () => {
+  const trendingAppsContainer = document.getElementById('trending--apps');
+  if (!trendingAppsContainer) return;
+
+  const appsArray = Array.from(globalApps.values());
+  if (appsArray.length === 0) return;
+
+  const selectedApps = appsArray.sort(() => 0.5 - Math.random()).slice(0, 6);
+
+  trendingAppsContainer.innerHTML = selectedApps.map(app => `
+    <div class="trending-app-card">
+      <div class="blurred-bg" style="background-image: url('${app.logo || './assets/pear.svg'}');"></div>
+      <img src="${app.logo || './assets/pear.svg'}" />
+      <h3 style="font-weight: 900; margin-bottom: 4px;">${app.name}</h3>
+      <p style="position: absolute;font-weight: 900;margin-bottom: 4px;top: 1rem;right: 1rem;color: #adff2fc7;font-size: 10px;">${formatDate(app.createAt)}</p>
+      <p style="white-space: break-spaces; color: #ddd; font-size: 12px; font-weight: 900;">${app.appDescription ? app.appDescription : app.appType}</p>
+    </div>
+  `).join('');
+
+  document.querySelectorAll('.run-cmd').forEach(button => {
+    button.addEventListener('click', (e) => {
+      const cmd = e.currentTarget.getAttribute('data-cmd');
+      runPearCommand(cmd);
+    });
+  });
+};
+
+
+listProducts().then(displayTrendingApps);

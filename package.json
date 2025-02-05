@@ -10,7 +10,10 @@
       "width": "1040"
     },
     "links": [ 
-      "https://cdn.jsdelivr.net/npm/xterm/css/xterm.css"
+      "https://cdn.jsdelivr.net/npm/xterm/css/xterm.css",
+      "https://api.coingecko.com",
+      "wss://stream.binance.com",
+      "https://api.binance.com"
     ]
   },
   "type": "module",

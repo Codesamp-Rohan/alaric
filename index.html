@@ -6,12 +6,15 @@
   <script type="module" src="./local.js"></script>
   <script type="module" src="./page.js"></script>
   <script type="module" src="./notification.js"></script>
+  <script type="module" src="./bitcoin.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div id="bar"><pear-ctrl></pear-ctrl></div>
   <div class="blob1"></div>
   <div class="blob2"></div>
-  <p class="version">Build V1.0.1</p>
+  <p class="version">Build V1.0.5</p>
+  <!-- <p id="price"></p> -->
   <main>
     <div class="notification">
       <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 10px;">
@@ -24,38 +27,53 @@
       <h1>PearMaze</h1>
       <div style="display: flex; flex-direction: column; justify-content: space-between; width: 100%; height: 93%;">
       <ul style="margin-top: 2rem;">
-        <li><span class="dot dot-hide"></span><img src="./assets/pin.png" class="icon" /><p>Pinned Apps</p>
-          <p id="pinned-apps-no">0</p></li>
-        <li><span class="dot dot-hide"></span><img src="./assets/local.png" class="icon" /><p>Local System Apps</p>
-          <p id="local-apps-no">0</p></li>
-        <li><span class="dot dot-hide"></span><img src="./assets/global.png" class="icon" /><p>Global Apps</p>
-          <p id="global-apps-no">0</p></li>
-          <li><span class="dot dot-hide"></span><img src="./assets/og.png" class="icon" /><p>OnlyGames</p>
-            <p id="onlyGames-apps-no">0</p></li>
-        <li><span class="dot dot-hide"></span><img src="./assets/add.png" class="icon" /><p>Add App</p></li>
-        <li><span class="dot dot-hide"></span><img src="./assets/my.png" class="icon" /><p>Personal Apps</p>
+        <li><span class="dot dot-hide"></span><img src="./assets/my.png" class="icon" /><p>My Apps</p>
           <p id="personal-apps-no">0</p></li>
+        <li><span class="dot dot-hide"></span><img src="./assets/install.png" class="icon" /><p>Installed Apps</p>
+          <p id="local-apps-no">0</p></li>
+        <li><span class="dot dot-hide"></span><img src="./assets/directory.png" class="icon" /><p>Apps Directory</p>
+          <p id="global-apps-no">0</p></li>
+          <li><span class="dot dot-hide"></span><img src="./assets/room.png" class="icon" /><p>Rooms</p>
+            <p id="rooms-apps-no">0</p></li>
+          <li><span class="dot dot-hide"></span><img src="./assets/game.png" class="icon" /><p>OnlyGames</p>
+            <p id="onlyGames-apps-no">0</p></li>
+            <li><span class="dot dot-hide"></span><img src="./assets/crypto.png" class="icon" /><p>Live Crypto</p></li>
+        <li><span class="dot dot-hide"></span><img src="./assets/add.png" class="icon" /><p>Add App</p></li>
+        <!-- <li><span class="dot dot-hide"></span><img src="./assets/my.png" class="icon" /><p>Personal Apps</p>
+          <p id="personal-apps-no">0</p></li> -->
       </ul>
       <ul>
-        <li class="active"><span class="dot dot-hide"></span><img src="./assets/alertMsg.png" class="icon" /><p>Alert Message</p></li>
+        <li class="active"><span class="dot dot-hide"></span><img src="./assets/error.png" class="icon" /><p>Alert Message</p></li>
       <li class="active"><span class="dot dot-hide"></span><img src="./assets/pear.png" class="icon" /><p>About the Creator</p></li>
       </ul>
       </div>  
     </section>
     <div class="data--area">
       <div class="overlay hide"></div>
-      <!-- Pinned Apps -->
-      <section class="page" id="pinned--page">
-        <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999;">
-          <p class="page--header">Your Pinned Apps</p>
+      <div id="global--popUp" class="hide">
+        <div id="popUp--pearContent"></div>
+      </div>
+      <!-- Personal Apps -->
+      <section class="page" id="personal--page">
+        <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999; border-radius: 10px; border: 1px solid #eee; background-color: #fff;">
+          <p class="page--header">Apps added by You 🫵</p>
           </div>
+          <div class="personal--list--area" style="overflow: visible !important;"></div>
       </section>
-      <!-- Local Apps -->
+      <!-- Installed / Local Apps -->
       <section class="page hide" id="local--page">
-        <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999; background-color: #fff;">
+        <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999; background-color: #fff;border: 1px solid #eee;padding-inline: 10px;border-radius: 12px;">
           <p class="page--header">Your Local Pear Apps</p>
           <button class="clear-cacheBtn">CLEAR CACHE</button>
           </div>
+          <div id="trending--apps-container">
+            <div style="margin: 1rem 1rem 0.2rem 1rem;">
+            <p style="color: #aaa; font-size: 10px;">Apps Directory</p>
+            <h1 id="trending--apps-heading" style="font-size: 13px; color: #444;">Curated Only for You</h1>
+            </div>
+            <div id="trending--apps"></div>
+        </div>
+        
           <div class="loader">
             <svg viewBox="25 25 50 50">
               <circle r="20" cy="50" cx="50"></circle>
@@ -63,19 +81,11 @@
             <!-- <p>Loading, great things take time.</p> -->
           </div>
           <div class="message hide" style="color: red; font-size: 40px; font-weight: 900;">Error in retrieving the data.</div>
-          <div class="list--area">
-          </div>
+          <div class="list--area"></div>
       </section>
-      <!-- Global Apps -->
+      <!-- Apps Directory / Global Apps -->
       <section class="page hide" id="global--page">
-        <div id="global--popUp" class="hide">
-          <!-- <div style="display: flex; align-items: center; justify-content: space-between;"> -->
-            <!-- <p style="font-size: 10px; color: #bbb;">PopUp</p> -->
-            <!-- <button class="button" style="width: fit-content; margin-top: 0;" id="close-global--popUp">close</button> -->
-          <!-- </div> -->
-          <div id="popUp--pearContent"></div>
-        </div>
-        <div  style="display: flex;flex-direction: row;justify-content: space-between;align-items: center;width: 100%;position: sticky;top: 0;z-index: 99;background-color: #fff;">
+        <div  style="display: flex;flex-direction: row;justify-content: space-between;align-items: center;width: 100%;position: sticky;top: 0;z-index: 99;background-color: #fff;border: 1px solid #eee;padding-inline: 10px;border-radius: 12px;">
           <p class="page--header">Global Apps</p>
           <div style="display: flex; align-items: center; gap: 10px;">
             <input type="text" style="margin-top: 0;border-radius: 5px;padding: 10px; width: 160px;" id="global--search" placeholder="Search the App" />
@@ -92,6 +102,14 @@
           </div>
           <div class="list--area"></div>
       </section>
+      <!-- Room Page -->
+      <section class="page" id="room--page">
+        <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999; border: 1px solid #eee; border-radius: 10px;">
+          <p class="page--header" style="gap: 8px;">Rooms</p>
+          </div>
+          <div class="list--area">
+          </div>
+      </section>
       <!-- Only Games -->
       <section class="page" id="onlyGames--page">
         <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999;">
@@ -99,6 +117,29 @@
           </div>
           <div class="list--area">
             <p>Only Games coming SOON!!!</p>
+          </div>
+      </section>
+      <!-- Live Crypto -->
+      <section class="page" id="onlyGames--page">
+        <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999;">
+          <p class="page--header">Only Games using Holesail</p>
+          </div>
+          <!-- <canvas id="priceChart" width="100" height="60"></canvas> -->
+          <div style="width: 100%; height: 80%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <h2>Cryptocurrency Data</h2>
+            <table id="cryptoTable">
+              <thead>
+                  <tr>
+                      <th>Symbol</th>
+                      <th>Price</th>
+                      <th>7D</th>
+                      <th>Last 7 Days</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <!-- Data will be inserted here dynamically -->
+              </tbody>
+          </table>
           </div>
       </section>
       <!-- Add App Form -->
@@ -127,6 +168,7 @@
                 <option value="pear">Pear</option>
                 <option value="terminal">Terminal</option>
                 <option value="holesail">Holesail</option>
+                <option value="room">Room</option>
                 <option value="other">Other</option>
               </select>
             <button type="button" id="submit-btn" class="button">Submit</button>
@@ -135,15 +177,15 @@
             <p>Please enter every detail carefully. Do not play around.</p>
           </div> -->
       </section>
-      <!-- Personal Apps -->
+      <!-- Personal Apps
       <section class="page" id="personal--page">
         <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999;">
           <p class="page--header">Apps added by You 🫵</p>
           </div>
           <div class="list--area" style="overflow: visible !important;"></div>
-      </section>
+      </section> -->
          <!-- Important Message -->
-         <section class="page hide" id="aboutMe--page" style="padding-bottom: 1rem;">
+         <section class="page hide" id="rules--page" style="padding-bottom: 1rem;">
           <div  style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999;">
           <p class="page--header" style="background-color: #fff;">
             <!-- 👉️ All Important points are here 👈️</p> -->
