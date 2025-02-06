@@ -707,6 +707,9 @@ td p{
     opacity: 1 !important;
     scale: 1 !important;
   }
+  #global-msg{
+    margin: 1rem;
+  }
 
   #global--popUp{
     position: fixed;

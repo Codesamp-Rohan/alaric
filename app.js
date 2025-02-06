@@ -113,7 +113,7 @@ const listProducts = async () => {
             <div class="list--running hide"></div>
             <img 
               style="box-shadow: inset 0 0 13px #ddd;height: 60px; min-width: 60px; width: 60px; padding: 7px; background: #000; border-radius: 13px; border: 0;" 
-              src="${app.logo || './assets/pear.svg'}" 
+              src="${app.logo || './assets/alaric.png'}" 
               alt="App Logo"/>
             <div style="width: 100%; display: flex; flex-direction: column;">
               <div style="display: flex; gap: 10px; align-items: center;">
@@ -153,7 +153,7 @@ const listProducts = async () => {
             <div class="list--running hide"></div>
             <img 
               style="box-shadow: inset 0 0 13px #ddd;height: 60px; min-width: 60px; width: 60px; padding: 7px; background: #000; border-radius: 13px; border: 0;" 
-              src="${app.logo || './assets/pear.svg'}" 
+              src="${app.logo || './assets/alaric.png'}" 
               alt="App Logo"/>
             <div style="width: 100%; display: flex; flex-direction: column;">
               <div style="display: flex; gap: 10px; align-items: center;">
@@ -184,7 +184,6 @@ const listProducts = async () => {
     .join('');
 
     // <p style="font-weight: 100; color: #777; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%; font-size: 10px;">${cmd}</p>
-
 
   document.querySelectorAll('.app-item').forEach(item => {
     item.addEventListener('click', (event) => {
@@ -275,19 +274,16 @@ document.getElementById('global--search').addEventListener('input', (e) => {
   listProducts(searchQuery); // Re-filter and list products
 });
 
-
-const addProduct = async (product) => {
+const addProduct = async (product, fromPeer = false) => {
   if (!globalApps.has(product.id)) {
-    await feed.append(product);
     globalApps.set(product.id, product);
-    console.log('Product added:', product);
+    if (!fromPeer) {
+      await feed.append(product);
+      swarm.connections.forEach((conn) => {
+        conn.write(JSON.stringify({ type: 'app-data', data: product }));
+      });
+    }
     listProducts();
-
-    swarm.connections.forEach(connection => {
-      connection.write(JSON.stringify({ type: 'app-data', data: product }));
-    });
-  } else {
-    console.log('Duplicate product ID ignored:', product.id);
   }
 };
 
@@ -304,12 +300,12 @@ const joinSwarm = () => {
       connection.write(JSON.stringify({ type: 'app-data', data: app }));
     });
 
-    connection.on('data', (data) => {
+    connection.on('data', async (data) => {
       try {
         const message = JSON.parse(data.toString());
         if (message.type === 'app-data') {
           console.log('Received app data from peer:', message.data);
-          addProduct(message.data);
+          await addProduct(message.data);
         }
       } catch (err) {
         notification('Failed to parse incoming data:', 'error');
@@ -317,13 +313,13 @@ const joinSwarm = () => {
       } 
     });
 
-    connection.on('error', (err) => {
-      console.error('Connection error:', err);
-    });
+    // connection.on('error', (err) => {
+      // console.error('Connection error:', err);
+    // });
 
-    connection.on('close', () => {
-      console.log('Connection closed');
-    });
+    // connection.on('close', () => {
+      // console.log('Connection closed');
+    // });
   });
 
   listProducts();
@@ -375,7 +371,7 @@ const addApp = async () => {
           reader.readAsDataURL(appLogo);
         });
       } else {
-        return await getDefaultLogoBase64('./assets/pear.svg');
+        return await getDefaultLogoBase64('./assets/alaric.png');
       }
     } else {
       if (appLogo) {
@@ -535,7 +531,7 @@ const listPersonalApps = async () => {
           <div class="personal-list" style="display: flex;flex-direction: column;align-items: center;gap: 10px;position: relative;background-color: #000000;width: 100%;height: 100%;box-shadow: inset 0 0 30px #ddd;">
             <img 
               style="transition: 300ms;padding: 7px;border-radius: 13px;border: 0;width: 160%;height: 130%;position: absolute;top: 50%;right: 0;filter: blur(7px);transform: translateY(-61%);" 
-              src="${app.logo || './assets/pear.svg'}" 
+              src="${app.logo || './assets/alaric.png'}" 
               alt="App Logo"/>
             <div style="width: 100%;display: flex;flex-direction: column;position: absolute;
     bottom: 0;height: 100%;background: linear-gradient(0deg, rgb(0 0 0) 0%, rgb(0 0 0) 19%, rgb(0 0 0 / 0%) 75%, rgba(255, 255, 255, 0) 100%);padding: 1.5rem 1rem;justify-content: flex-end;">
@@ -580,12 +576,14 @@ const openPopup = (app) => {
 
   popupContent.innerHTML = `
     <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 1rem;">
-      <img style="box-shadow: inset 0 0 13px #ddd;height: 60px; min-width: 60px; width: 60px; padding: 7px; background: #000; border-radius: 13px; border: 0;" src="${app.logo || './assets/pear.svg'}" alt="App Logo"/>
+      <img style="box-shadow: inset 0 0 13px #ddd;height: 60px; min-width: 60px; width: 60px; padding: 7px; background: #000; border-radius: 13px; border: 0;" src="${app.logo || './assets/alaric.png'}" alt="App Logo"/>
       <div style="display: flex; flex-direction: column; gap: 4px;">
-        <div style="display: flex; gap: 4px; align-items: center;">
+        <div style="display: flex; flex-direction: column;">
           <h2 class="popUp--name">${app.name}</h2>
+          <div style="display: flex; gap: 4px; align-items: center;">
           <p>${app.appType}</p>
           <p>${formatDate(app.createAt)}</p>
+          </div>
         </div>
         <p>${app.appDescription || "No description available"}</p>
       </div>
@@ -638,8 +636,8 @@ const displayTrendingApps = () => {
 
   trendingAppsContainer.innerHTML = selectedApps.map(app => `
     <div class="trending-app-card">
-      <div class="blurred-bg" style="background-image: url('${app.logo || './assets/pear.svg'}');"></div>
-      <img src="${app.logo || './assets/pear.svg'}" />
+      <div class="blurred-bg" style="background-image: url('${app.logo || './assets/alaric.png'}');"></div>
+      <img src="${app.logo || './assets/alaric.png'}" />
       <h3 style="font-weight: 900; margin-bottom: 4px;">${app.name}</h3>
       <p style="position: absolute;font-weight: 900;margin-bottom: 4px;top: 1rem;right: 1rem;color: #adff2fc7;font-size: 10px;">${formatDate(app.createAt)}</p>
       <p style="white-space: break-spaces; color: #ddd; font-size: 12px; font-weight: 900;">${app.appDescription ? app.appDescription : app.appType}</p>

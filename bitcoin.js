@@ -57,7 +57,7 @@ const cryptos = [
               new Chart(canvas, {
                   type: 'line',
                   data: {
-                      labels: data.map(item => new Date(item[0]).toLocaleDateString()),  // Date labels
+                      labels: data.map(item => new Date(item[0]).toLocaleDateString()),
                       datasets: [{
                           label: symbol.replace('USDT', ''),
                           data: prices,

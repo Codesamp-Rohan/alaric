@@ -4,16 +4,13 @@
   <link rel="stylesheet" href="./style.css">
   <script type='module' src='./app.js'></script>
   <script type="module" src="./local.js"></script>
-  <script type="module" src="./page.js"></script>
-  <script type="module" src="./notification.js"></script>
-  <script type="module" src="./bitcoin.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div id="bar"><pear-ctrl></pear-ctrl></div>
   <div class="blob1"></div>
   <div class="blob2"></div>
-  <p class="version">Build V1.0.5</p>
+  <p class="version">Build V4</p>
   <!-- <p id="price"></p> -->
   <main>
     <div class="notification">
@@ -24,7 +21,7 @@
       <p class="notification-message"></p>
     </div>
     <section class="sideMenu">
-      <h1>PearMaze</h1>
+      <h1 style="display: flex; align-items: center; gap: 4px;"><img src="./assets/alaric.png" style="width: 40px; height: 40px;" />Alaric.app</h1>
       <div style="display: flex; flex-direction: column; justify-content: space-between; width: 100%; height: 93%;">
       <ul style="margin-top: 2rem;">
         <li><span class="dot dot-hide"></span><img src="./assets/my.png" class="icon" /><p>My Apps</p>
@@ -43,8 +40,8 @@
           <p id="personal-apps-no">0</p></li> -->
       </ul>
       <ul>
-        <li class="active"><span class="dot dot-hide"></span><img src="./assets/error.png" class="icon" /><p>Alert Message</p></li>
-      <li class="active"><span class="dot dot-hide"></span><img src="./assets/pear.png" class="icon" /><p>About the Creator</p></li>
+        <li class="active"><span class="dot dot-hide"></span><img src="./assets/imp.png" class="icon" /><p>Alert Message</p></li>
+      <li class="active"><span class="dot dot-hide"></span><img src="./assets/about.png" class="icon" /><p>About the Creator</p></li>
       </ul>
       </div>  
     </section>
@@ -100,11 +97,13 @@
           <button class="button" id="reload--app" style="width: fit-content;font-size: 10px;font-weight: 900;margin-top: 0; color: #fff; background-color: #000;border-radius: 5px;">Reload App</button>
           </div>
           </div>
-          <div class="list--area"></div>
+          <!-- <p id="global-msg">No Global apps added yet!!!</p> -->
+          <div class="list--area">
+          </div>
       </section>
       <!-- Room Page -->
       <section class="page" id="room--page">
-        <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999; border: 1px solid #eee; border-radius: 10px;">
+        <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 99; border: 1px solid #eee; background-color: #fff; border-radius: 10px;">
           <p class="page--header" style="gap: 8px;">Rooms</p>
           </div>
           <div class="list--area">
@@ -151,7 +150,7 @@
             <label>Name of the App*</label>
             <input required type="text" name="app-name" id="app-name" placeholder="Eg: Keet">
             <label style="margin-top: 1rem;">Upload Logo</label>
-            <input type="file" name="app-image" id="app-image" placeholder="Upload an image">
+            <input type="file" accept="image/png, image/jpeg, image/webp" name="app-image" id="app-image" placeholder="Upload an image">
             <label style="margin-top: 1rem;">Add run command*<br/>
               <span style="color: rgb(0, 128, 255); font-size: 8px; font-weight: 900;">Please add the complete command</span>
             </label>
@@ -189,50 +188,36 @@
           <div  style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999;">
           <p class="page--header" style="background-color: #fff;">
             <!-- 👉️ All Important points are here 👈️</p> -->
-            📜 Rules & Important Messages – pearMaze</p>
+            📜 Rules & Important Messages – Alaric.app</p>
           </div>
-          <div style="margin: 1rem;">
-            <h1 style="margin: 10px;"><strong>🚀 Welcome to pearMaze!</strong></h1>
-            <p style="margin-left: 3rem;">pearMaze is a decentralized platform that allows seamless sharing and discovery of peer-to-peer applications. To ensure a smooth experience for all users, please follow these guidelines:</p>
-            <h1 style="margin: 10px;"><strong>📌 General Rules:</strong></h1>
-            <div style="display: flex; flex-direction: column; gap: 6px; margin-left: 3rem;">
-            <p><strong>1. Respect Privacy & Security</strong> – Do not share sensitive information publicly. Ensure that the apps you use or share are safe.</p>
-            <p><strong>2. No Malicious Content</strong> – Avoid adding or running apps that contain harmful code, malware, or unethical scripts.</p>
-            <p><strong>3. Fair Usage</strong> – Do not spam or overload the network with excessive data requests or unnecessary apps.</p>
-            <p><strong>4. P2P Ethics</strong> – Since pearMaze relies on P2P networks, be mindful of what you share and respect others' bandwidth and resources.</p>
-            <p><strong>5. Open Source & Transparency</strong> – If you share an app, consider providing a clear description and repository link for transparency.</p>
-            </div>
-            <h1 style="margin: 10px;"><strong>⚠️ Important Notes:</strong></h1>
-            <div style="display: flex; flex-direction: column; gap: 6px; margin-left: 3rem;">
-            <p><strong>1. Data Storage</strong> – pearMaze caches app data for faster loading. If you face any issues, try clearing the cache or restarting the app.</p>
-            <p><strong>2. Global App Section</strong> – This is a shared space; apps added here will be visible to all connected peers.</p>
-            <p><strong>3. Fair Usage</strong> – Do not spam or overload the network with excessive data requests or unnecessary apps.</p>
-            <p><strong>4. P2P Ethics</strong> – Since pearMaze relies on P2P networks, be mindful of what you share and respect others' bandwidth and resources.</p>
-            <p><strong>5. Open Source & Transparency</strong> – If you share an app, consider providing a clear description and repository link for transparency.</p>
-            </div>
-            <h1><strong>📞 Need Help?</strong></h1>
-            <p style="margin-left: 3rem;">
-              If you encounter any issues or have feedback, feel free to reach out via <strong><a href="mailto:rohanchaudhary.bkbiet2022@gmail.com">rohanchaudhary.bkbiet2022@gmail.com</a></strong>
-              
-              Happy sharing! 🚀</p>
+          <div style="margin: 1rem; display: flex; flex-direction: column; gap: 4px;">
+            <p><strong>Use Full Commands - </strong>Always write and execute complete commands properly</p>
+            <p><strong>No Spamming - </strong>Do not flood the system with unnecessary or repeated commands</p>
+            <p><strong>Add only Useful & Working Apps and Rooms - </strong>Avoid adding apps that are broken or not functional</p>
+            <p><strong>Maintain Decorum - </strong>Be respectful and follow proper conduct while using pearMaze</p>
+            <p><strong>Avoid Duplication - </strong>Do not add multiple instances of the same app</p>
+            <p><strong>Follow Naming Conventions – </strong>Use proper and meaningful names for apps and commands</p>
+            <p><strong>Test Before Adding - </strong>Verify that the app works as expected before adding it</p>
+            <p><strong>Respect User Data - </strong>Do not misuse or tamper with other users' data</p>
+            <p><strong>Logo size - </strong>should be lower than 500kb</p>
           </div>
         </section>
       <!-- About ME -->
       <section class="page hide" id="aboutMe--page" style="padding-bottom: 1rem;">
         <div  style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999;">
-        <p class="page--header">Creator</p>
+        <p class="page--header" style="padding: 0;">Creator</p>
         </div>
         <h1 style="font-weight: 900; font-size: 2rem; margin-top: 1.6rem;"><span style="color: #bbb;">About Me, </span></br>I'm a <span style="text-decoration: underline; font-style: italic;">Front-End biased Developer</span> living in India.</h1>
         <img style="width: 100%; height: 40vh; object-fit: cover; border-radius: 10px;" src="./assets/me.jpeg" />
         <p style="margin-top: 2rem;"> Hi, I'm Rohan, a passionate developer specializing myself in P2P apps and front-end design and development. I love creating innovative solutions and design. My goal is to make beautiful and functional apps that connect people in meaningful ways. When I'm not coding, I enjoy exploring new ideas and learning more about design and technology.</p>
             <ul class="social--links" style="margin-top: 0.6rem;">
-              <a href="https://github.com/Codesamp-Rohan" target="_blank" class="active"><img src="./assets/github.png" class="icon" /><p>GitHub</p></a>
-              <a href="https://www.linkedin.com/in/rohan-chaudhary-399742255/" target="_blank" class="active"><img src="./assets/linkedin.png" class="icon" /><p>LinkedIn</p></a>
-              <a href="mailto:rohanchaudhary.bkbiet2022@gmail.com" class="active"><img src="./assets/mail.png" class="icon" /><p>G-Mail</p></a>
+              <a href="https://github.com/Codesamp-Rohan" target="_blank" class="active"><img src="./assets/github.png" style="width: 20px; height: 20px; padding: 0; background: #fff; border: 0; border-radius: 7px;" /><p>GitHub</p></a>
+              <a href="https://www.linkedin.com/in/rohan-chaudhary-399742255/" target="_blank" class="active"><img src="./assets/linkedin.png" style="width: 20px; height: 20px; padding: 0; background: #fff; border: 0; border-radius: 7px;" /><p>LinkedIn</p></a>
+              <a href="mailto:rohanchaudhary.bkbiet2022@gmail.com" class="active"><img src="./assets/mail.png" style="width: 20px; height: 20px; padding: 0; background: #fff; border: 0; border-radius: 7px;" /><p>G-Mail</p></a>
             </ul>
             <ul class="social--links">
-            <a class="active" style="width: fit-content; margin-top: 10px;"><img src="./assets/instagram.png" class="icon" /><p>Instagram</p></a>
-            <a href="https://codesamprohan.me" target="_blank" class="active" style="width: fit-content; margin-top: 10px;"><img src="./assets/portfolio.png" class="icon" /><p>Portfolio</p></a>
+            <a class="active" style="width: fit-content; margin-top: 10px;"><img src="./assets/instagram.png" style="width: 20px; height: 20px; padding: 0; background: #fff; border: 0; border-radius: 7px;" /><p>Instagram</p></a>
+            <a href="https://codesamprohan.me" target="_blank" class="active" style="width: fit-content; margin-top: 10px;"><img src="./assets/portfolio.png" style="width: 20px; height: 20px; padding: 0; background: #fff; border: 0; border-radius: 7px;" /><p>Portfolio</p></a>
             </ul>
       </section>
       <!-- Home Page -->
@@ -241,17 +226,22 @@
           <p class="page--header">Hey there, How are you doing???</p>
           </div>
           <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; gap: 20px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-            <img style="width: 20%; object-fit: cover; border-radius: 10px;" src="./assets/pear.svg" />
-            <h1>Welcome Back Pear!!!</h1>
+            <img id="home--img" style="width: 20%; object-fit: cover; border-radius: 10px;" src="./assets/alaric.png" />
+            <h1>Welcome Back Alaricans!!!</h1>
             <p>Select any side-menu option to get started.</p>
           </div>
       </section>
     </div>
   </main>
 </body>
+<script type="module" src="./bitcoin.js"></script>
+<script type="module" src="./page.js"></script>
+<script type="module" src="./notification.js"></script>
+<script type="module" src="./fileHandle.js"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => {
-  const pearImage = document.querySelector("img[src='./assets/pear.svg']");
+  // const pearImage = document.querySelector("img[src='./assets/A3.png']");
+  const pearImage = document.getElementById('home--img');
   
   pearImage.style.transition = "transform 0.1s ease-out";
 
@@ -269,6 +259,7 @@
   document.addEventListener("mouseleave", () => {
     pearImage.style.transform = "translate(0, 0)";
   });
+
 });
 
 </script>
