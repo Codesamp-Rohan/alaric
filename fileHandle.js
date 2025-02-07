@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const file = event.target.files[0];
     if (!file) return;
 
-    if (!validateFile(file) || !validateFileSize(file) || !(await validateImageDimensions(file))) {
+    if (!validateFile(file) || !validateFileSize(file)) {
       fileInput.value = ""; // Clear the input field if invalid
       return;
     }
@@ -35,20 +35,5 @@ document.addEventListener("DOMContentLoaded", () => {
       return false;
     }
     return true;
-  }
-
-  function validateImageDimensions(file, maxWidth = 256, maxHeight = 256) {
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.src = URL.createObjectURL(file);
-      img.onload = function () {
-        if (img.width > maxWidth || img.height > maxHeight) {
-          alert(`Image must be ${maxWidth}x${maxHeight} pixels or smaller!`);
-          resolve(false);
-        } else {
-          resolve(true);
-        }
-      };
-    });
   }
 });

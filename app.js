@@ -11,6 +11,7 @@ const { exec } = require('child_process');
 
 const swarm = new Hyperswarm();
 const COMMON_GLOBAL_KEY = '45a3e8723d7368659d465871386ee74cdcd99d64b041a327f52302fc8ff1acac';
+export let isAdmin = false;
 
 let sortOrder = 'newest';
 let feed = new Hypercore(Pear.config.storage + './mazeData1', {
@@ -20,17 +21,17 @@ let personalAppFeed = new Hypercore(Pear.config.storage + './personalApp', {
   valueEncoding: 'json'
 });
 // let feed = new Hypercore(Pear.config.storage + './hyperMazeData', {
-//   valueEncoding: 'json',
-// });
-// let personalAppFeed = new Hypercore(Pear.config.storage + './hyperMazeData/personalApp1', {
-//   valueEncoding: 'json'
-// });
-const globalApps = new Map();
-const personalApps = new Map();
-
-function generateId() {
-  return `${Date.now()}-${Math.floor(Math.random() * 1e6).toString(36)}`;
-}
+  //   valueEncoding: 'json',
+  // });
+  // let personalAppFeed = new Hypercore(Pear.config.storage + './hyperMazeData/personalApp1', {
+    //   valueEncoding: 'json'
+    // });
+    const globalApps = new Map();
+    const personalApps = new Map();
+    
+    function generateId() {
+      return `${Date.now()}-${Math.floor(Math.random() * 1e6).toString(36)}`;
+    }
 
 // Function to highlight search term
 const highlightSearchTerm = (text, searchTerm) => {
@@ -95,6 +96,14 @@ const listProducts = async () => {
     appsToDisplay = sortApps(appsToDisplay);
   }
 
+  document.getElementById('global--search').addEventListener('input', (e) => {
+    if(e.target.value === 'hello'){
+      isAdmin = true;
+      console.log('Admin joined!!! : ', isAdmin);
+    }
+  });
+   
+
   appsToDisplay = appsToDisplay.sort((a, b) => {
     if (sortOrder === 'asc') {
       return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
@@ -121,8 +130,14 @@ const listProducts = async () => {
                 <p style="font-size: 11px; font-weight: 900; color: #247538; white-space: nowrap;">${app.appType}</p>
                   <p style="font-size: 11px; font-weight: 900; color: #247538; white-space: nowrap;">|</p>
                  <p style="font-size: 9px; font-weight: 900; color: #247538; white-space: nowrap;">${formatDate(app.createAt)}</p>
+                 <a href="${(app.link === undefined || app.link === '') ? 'https://github.com/Codesamp-Rohan' : app.link}" target="_blank">
+                 <img src="./assets/link.png" style="width: 11px; height: 11px;" />
+                 </a>
+                 ${isAdmin ? 
+                  `<p style="font-size: 11px; font-weight: 900; color: #247538; white-space: nowrap;">|</p>`
+                   : ``}
               </div>
-              <p style="font-weight: 100; color: #777; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%; font-size: 14px;">${app.appDescription ? app.appDescription : cmd}</p>
+              <p style="font-weight: 100; color: #777; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%; font-size: 14px;">${app.appDescription ? app.appDescription : app.cmd}</p>
             </div>
           </div>
           <div class="list--side--menu">
@@ -161,6 +176,9 @@ const listProducts = async () => {
                 <p style="font-size: 11px; font-weight: 900; color: #247538; white-space: nowrap;">${app.appType}</p>
                   <p style="font-size: 11px; font-weight: 900; color: #247538; white-space: nowrap;">|</p>
                  <p style="font-size: 9px; font-weight: 900; color: #247538; white-space: nowrap;">${formatDate(app.createAt)}</p>
+                   <a href="${(app.link === undefined || app.link === '') ? 'https://github.com/Codesamp-Rohan' : app.link}" target="_blank">
+                 <img src="./assets/link.png" style="width: 11px; height: 11px;" />
+                 </a>
               </div>
               <p style="font-weight: 100; color: #777; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%; font-size: 14px;">${app.appDescription ? app.appDescription : cmd}</p>
             </div>
@@ -271,8 +289,26 @@ const runPearCommand = (cmd) => {
 // Adding the search functionality:
 document.getElementById('global--search').addEventListener('input', (e) => {
   const searchQuery = e.target.value.trim();
-  listProducts(searchQuery); // Re-filter and list products
+  if (searchQuery === 'hello') {
+    isAdmin = true;
+    console.log('Admin joined!!! : ', isAdmin);
+    document.getElementById('app-heading').innerText = 'Alaric.app Admin';
+    document.getElementById('dashboard--menu').classList.remove('hide');
+    document.getElementById('admin--page').classList.remove('hide');
+  }
+  listProducts(searchQuery);
 });
+
+document.getElementById('close--admin').addEventListener('click', (e) => {
+  e.preventDefault();
+  isAdmin = false;
+  console.log('Admin Left!!! : ', isAdmin);
+  document.getElementById('app-heading').innerText = 'Alaric.app';
+  document.getElementById('dashboard--menu').classList.add('hide');
+  document.getElementById('admin--page').classList.add('hide');
+
+  listProducts();
+})
 
 const addProduct = async (product, fromPeer = false) => {
   if (!globalApps.has(product.id)) {
@@ -346,6 +382,7 @@ const addApp = async () => {
   const appCmd = document.getElementById('app-cmd').value.trim();
   const appLogo = document.getElementById('app-image').files[0];
   const appType = document.getElementById('app-type').value;
+  const appLink = document.getElementById('app-link').value.trim();
 
   if (!appName || !appCmd) {
     notification('Please fill in the required fields.', 'error');
@@ -381,7 +418,7 @@ const addApp = async () => {
           reader.readAsDataURL(appLogo);
         });
       } else {
-        return await getDefaultLogoBase64('./assets/keet.png');
+        return await getDefaultLogoBase64('./assets/alaric.png');
       }
     }
   };
@@ -396,6 +433,7 @@ const addApp = async () => {
     appType: appType,
     appDescription: appDescription.value, // Use .value here to get the text
     logo: logoBase64,
+    link: appLink || 'https://github.com/Codesamp-Rohan',
     cmd: appCmd
   };  
 
@@ -408,6 +446,7 @@ const addApp = async () => {
   document.getElementById('app-image').value = '';
   document.getElementById('app-description').value = '';
   document.getElementById('app-cmd').value = '';
+  document.getElementById('app-link').value = '';
   charCount.textContent = "0/70";
 };
 
@@ -574,6 +613,14 @@ const openPopup = (app) => {
   popup.classList.toggle('hide');
   overlay.classList.remove('hide');
 
+  let runButtonHTML = '';
+
+  if (app.appType === 'room') {
+    runButtonHTML = `<a href="${app.cmd}" target="_blank" class="button" id="open-room-link" style="padding: 8px 15px; border: none; background:#ac0009; color: #fff; border-radius: 5px; cursor: pointer; margin-top: 0; box-shadow: inset 0 0 11px #FFF; text-decoration: none; text-align: center;">Open Room</a>`;
+  } else {
+    runButtonHTML = `<button class="button" id="run-command-btn" style="padding: 8px 15px; border: none; background:#ac0009; color: #fff; border-radius: 5px; cursor: pointer; margin-top: 0; box-shadow: inset 0 0 11px #FFF">Run</button>`;
+  }
+
   popupContent.innerHTML = `
     <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 1rem;">
       <img style="box-shadow: inset 0 0 13px #ddd;height: 60px; min-width: 60px; width: 60px; padding: 7px; background: #000; border-radius: 13px; border: 0;" src="${app.logo || './assets/alaric.png'}" alt="App Logo"/>
@@ -591,7 +638,7 @@ const openPopup = (app) => {
     <p style="overflow-wrap: break-word;width: 360px;"><strong>Command:</strong> <span id="appCommand">${app.cmd}</span></p>
 
     <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 1rem;">
-      <button class="button" id="run-command-btn" style="padding: 8px 15px; border: none; background:#ac0009; color: #fff; border-radius: 5px; cursor: pointer; margin-top: 0; box-shadow: inset 0 0 11px #FFF">Run</button>
+      ${runButtonHTML}
       <button class="button" id="copy-command-btn" style="padding: 8px 15px; border: none; background: #00236e; color: #fff; border-radius: 5px; cursor: pointer; margin-top: 0; box-shadow: inset 0 0 11px #FFF">Copy</button>
       <button class="button" style="margin-top: 0; width: fit-content;" id="close-global--popUp">Close</button>
     </div>
@@ -608,10 +655,16 @@ const openPopup = (app) => {
     overlay.classList.add('hide');
   });
 
-  // Run command button
-  document.getElementById('run-command-btn').addEventListener('click', () => {
-    runPearCommand(app.cmd);
-  });
+  // Run command button (only if appType is not 'room')
+  if (app.appType !== 'room') {
+    document.getElementById('run-command-btn').addEventListener('click', () => {
+      if(['holesail', 'terminal'].includes(app.appType)){
+        openHolesailPopUp(app.id, app.cmd);
+      } else {
+        runPearCommand(app.cmd);
+      }
+    });
+  }
 
   // Copy command button
   document.getElementById('copy-command-btn').addEventListener('click', () => {

@@ -10,7 +10,7 @@
   <div id="bar"><pear-ctrl></pear-ctrl></div>
   <div class="blob1"></div>
   <div class="blob2"></div>
-  <p class="version">Build V4</p>
+  <p class="version">Build V6</p>
   <!-- <p id="price"></p> -->
   <main>
     <div class="notification">
@@ -21,12 +21,12 @@
       <p class="notification-message"></p>
     </div>
     <section class="sideMenu">
-      <h1 style="display: flex; align-items: center; gap: 4px;"><img src="./assets/alaric.png" style="width: 40px; height: 40px;" />Alaric.app</h1>
+      <div style="display: flex; align-items: center; gap: 4px;"><img src="./assets/alaric.png" style="width: 40px; height: 40px;" /><h1 id="app-heading">Alaric.app</h1></div>
       <div style="display: flex; flex-direction: column; justify-content: space-between; width: 100%; height: 93%;">
       <ul style="margin-top: 2rem;">
         <li><span class="dot dot-hide"></span><img src="./assets/my.png" class="icon" /><p>My Apps</p>
           <p id="personal-apps-no">0</p></li>
-        <li><span class="dot dot-hide"></span><img src="./assets/install.png" class="icon" /><p>Installed Apps</p>
+        <li><span class="dot dot-hide"></span><img src="./assets/install.png" class="icon" /><p>System Pear Apps</p>
           <p id="local-apps-no">0</p></li>
         <li><span class="dot dot-hide"></span><img src="./assets/directory.png" class="icon" /><p>Apps Directory</p>
           <p id="global-apps-no">0</p></li>
@@ -36,8 +36,7 @@
             <p id="onlyGames-apps-no">0</p></li>
             <li><span class="dot dot-hide"></span><img src="./assets/crypto.png" class="icon" /><p>Live Crypto</p></li>
         <li><span class="dot dot-hide"></span><img src="./assets/add.png" class="icon" /><p>Add App</p></li>
-        <!-- <li><span class="dot dot-hide"></span><img src="./assets/my.png" class="icon" /><p>Personal Apps</p>
-          <p id="personal-apps-no">0</p></li> -->
+        <li id="dashboard--menu" class="hide"><span class="dot dot-hide"></span><img src="./assets/dashboard.png" class="icon" /><p>Dashboard</p></li>
       </ul>
       <ul>
         <li class="active"><span class="dot dot-hide"></span><img src="./assets/imp.png" class="icon" /><p>Alert Message</p></li>
@@ -85,7 +84,7 @@
         <div  style="display: flex;flex-direction: row;justify-content: space-between;align-items: center;width: 100%;position: sticky;top: 0;z-index: 99;background-color: #fff;border: 1px solid #eee;padding-inline: 10px;border-radius: 12px;">
           <p class="page--header">Global Apps</p>
           <div style="display: flex; align-items: center; gap: 10px;">
-            <input type="text" style="margin-top: 0;border-radius: 5px;padding: 10px; width: 160px;" id="global--search" placeholder="Search the App" />
+            <input type="text" style="margin-top: 0;border-radius: 5px;padding: 10px; width: 260px;" id="global--search" placeholder="Search the App" />
           <div class="dropdown">
             <button class="dropbtn"><img src="./assets/sort.png" style="width: 8px;" />Sort By</button>
             <div class="dropdown-content">
@@ -176,15 +175,16 @@
             <p>Please enter every detail carefully. Do not play around.</p>
           </div> -->
       </section>
-      <!-- Personal Apps
-      <section class="page" id="personal--page">
-        <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999;">
-          <p class="page--header">Apps added by You 🫵</p>
+      <!-- Admin Dashboard -->
+      <section class="page" id="admin--page">
+        <div style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999; border-radius: 10px; border: 1px solid #eee; background-color: #fff; padding-inline: 1rem;">
+          <p class="page--header">Admin Dashboard 🫵</p>
+          <button id="close--admin" style="background-color: rgba(255, 0, 0, 0.3);border: 1px solid red;color: red;border-radius: 6px;padding: 5px 10px;">Close</button>
           </div>
-          <div class="list--area" style="overflow: visible !important;"></div>
-      </section> -->
-         <!-- Important Message -->
-         <section class="page hide" id="rules--page" style="padding-bottom: 1rem;">
+          <div class="personal--list--area" style="overflow: visible !important;"></div>
+      </section>
+      <!-- Rules Page -->
+      <section class="page hide" id="rules--page" style="padding-bottom: 1rem;">
           <div  style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999;">
           <p class="page--header" style="background-color: #fff;">
             <!-- 👉️ All Important points are here 👈️</p> -->
@@ -201,7 +201,7 @@
             <p><strong>Respect User Data - </strong>Do not misuse or tamper with other users' data</p>
             <p><strong>Logo size - </strong>should be lower than 500kb</p>
           </div>
-        </section>
+      </section>
       <!-- About ME -->
       <section class="page hide" id="aboutMe--page" style="padding-bottom: 1rem;">
         <div  style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999;">
@@ -221,7 +221,7 @@
             </ul>
       </section>
       <!-- Home Page -->
-      <section class="page" id="home--page">
+      <section class="page" id="home--page" class="hide">
         <div  style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999;">
           <p class="page--header">Hey there, How are you doing???</p>
           </div>
