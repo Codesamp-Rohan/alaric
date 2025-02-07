@@ -116,7 +116,7 @@ body > h1:nth-of-ty(1) {
     color: #000;
     position: relative;
   }
-  #local-apps-no, #global-apps-no, #pinned-apps-no, #personal-apps-no, #onlyGames-apps-no, #rooms-apps-no{
+  #local-apps-no, #global-apps-no, #pinned-apps-no, #personal-apps-no, #onlyGames-apps-no, #rooms-apps-no, #admin-apps-no{
     position: absolute;
     right: 14px;
     color: #666;
@@ -268,6 +268,11 @@ body > h1:nth-of-ty(1) {
     overflow: hidden;
     scale: 0.6;
     opacity: 0;
+   }
+   .admin-app-item{
+    width: 100%;
+    transition: 300ms;
+    overflow: hidden;
    }
   .local-list-item{
     width: 100%;
@@ -734,6 +739,17 @@ td p{
   .img--icon{
     width: 10px;
     height: 10px;
+  }
+
+  .edit-popup{
+    width: 300px;
+    height: 300px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 999;
+    background-color: #26ff00;
   }
 
   #trending--apps{
