@@ -11,7 +11,6 @@ const { exec } = require('child_process');
 
 const swarm = new Hyperswarm();
 const COMMON_GLOBAL_KEY = '45a3e8723d7368659d465871386ee74cdcd99d64b041a327f52302fc8ff1acac';
-export let isAdmin = false;
 
 let sortOrder = 'newest';
 let feed = new Hypercore(Pear.config.storage + './mazeData1', {
@@ -80,52 +79,34 @@ document.getElementById('sortByOldest').addEventListener('click', (e) => {
 
 const listProducts = async () => {
   await feed.update();
-  globalApps.clear(); 
+  globalApps.clear();
 
-  // for await (const product of feed.createReadStream()) {
-  //   if (!globalApps.has(product.id) && !product.deleted) {
-  //     globalApps.set(product.id, product);
-  //   }
-  // }
-
-  const appVersions = new Map();
-
-  for await (const app of feed.createReadStream()) {
-    appVersions.set(app.id, app);
-  }
-
-  appVersions.forEach((app, id) => {
-    if (!app.deleted) {
-      globalApps.set(id, app);
+  for await (const product of feed.createReadStream()) {
+    if (!globalApps.has(product.id)) {
+      globalApps.set(product.id, product);
     }
-  });
+  }
 
   const globalAppsSection = document.querySelector('#global--page .list--area');
   const globalRoomSection = document.querySelector('#room--page .list--area');
-  const adminSection = document.querySelector('#admin--page .list--area');
-  document.querySelector('#global-apps-no').innerHTML = Array.from(globalApps.values()).filter(app => app.appType !== 'room').length;
+  
+  const globalAppsNo = document.querySelector('#global-apps-no');
+  globalAppsNo.innerHTML = Array.from(globalApps.values()).filter(app => app.appType !== 'room').length;
+  document.querySelector('#dash-apps-no').innerHTML = globalAppsNo.innerHTML;
+
   document.querySelector('#rooms-apps-no').innerHTML = Array.from(globalApps.values()).filter(app => app.appType === 'room').length;
-  document.querySelector('#admin-apps-no').innerHTML = Array.from(globalApps.values()).length;
   const searchTerm = document.getElementById('global--search').value.trim().toLowerCase();
+
 
   let appsToDisplay = Array.from(globalApps.values()).filter(app => app.appType !== 'room');
   let roomsToDisplay = Array.from(globalApps.values()).filter(app => app.appType === 'room');
-  let dashboardDisplay = Array.from(globalApps.values());
 
   if (searchTerm) {
     appsToDisplay = appsToDisplay.filter(app => 
       app.name.toLowerCase().includes(searchTerm) || app.cmd.toLowerCase().includes(searchTerm)
     );
     appsToDisplay = sortApps(appsToDisplay);
-  }
-
-  document.getElementById('global--search').addEventListener('input', (e) => {
-    if(e.target.value === 'hello'){
-      isAdmin = true;
-      console.log('Admin joined!!! : ', isAdmin);
-    }
-  });
-   
+  }   
 
   appsToDisplay = appsToDisplay.sort((a, b) => {
     if (sortOrder === 'asc') {
@@ -138,48 +119,11 @@ const listProducts = async () => {
     return 0;
   });
 
-  adminSection.innerHTML = dashboardDisplay.filter(app => !app.deleted).map(app => {
-    return `
-     <div style="position: relative; cursor: pointer;" class="admin-app-item reveal" data-cmd="${app.cmd}" data-id="${app.id}" id="${app.id}">
-          <div class="global-list-leftContent" style="display: flex; flex-direction: row; align-items: center; gap: 10px;">
-            <div class="list--running hide"></div>
-            <img 
-              style="box-shadow: inset 0 0 13px #ddd;height: 60px; min-width: 60px; width: 60px; padding: 7px; background: #000; border-radius: 13px; border: 0;" 
-              src="${app.logo || './assets/alaric.png'}" 
-              alt="App Logo"/>
-            <div style="width: 100%; display: flex; flex-direction: column;">
-              <div style="display: flex; gap: 10px; align-items: center;">
-                <p style="color: #333; font-size: 18px; font-weight: 900;"><strong>${app.name}</strong></p>
-                <p style="font-size: 11px; font-weight: 900; color: #247538; white-space: nowrap;">${app.appType}</p>
-                  <p style="font-size: 11px; font-weight: 900; color: #247538; white-space: nowrap;">|</p>
-                 <p style="font-size: 9px; font-weight: 900; color: #247538; white-space: nowrap;">${formatDate(app.createAt)}</p>
-                 <a href="${(app.link === undefined || app.link === '') ? 'https://github.com/Codesamp-Rohan' : app.link}" target="_blank">
-                 <img src="./assets/link.png" style="width: 11px; height: 11px;" />
-                 </a>
-              </div>
-              <p style="font-weight: 100; color: #777; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%; font-size: 14px;">${app.appDescription ? app.appDescription : app.cmd}</p>
-            </div>
-          </div>
-          <button class="delete-app" style="position: fixed; top: 50%; right: 0; transform: translateY(-50%);">delete</button>
-        </div>
-        `
-  }).join('');
-
-  document.querySelectorAll('.delete-app').forEach(button => {
-    button.addEventListener('click', (e) => {
-      e.stopPropagation(); // Prevent conflicts
-      const appId = e.target.closest('.admin-app-item').getAttribute('data-id');
-      console.log(appId);
-      deleteApp(appId);
-    });
-  });
-  
-
 //   <button class="edit-app" style="background: transparent; border: 0; width: 30px; height: 30px;position: absolute;right: 0;top: 50%;transform: translateY(-50%);">
 //   <img style="width: 12px;" src="./assets/edit.png" class="list--icon icon" />
 // </button>  
 
-  globalRoomSection.innerHTML = roomsToDisplay.filter(app => !app.deleted).map(app => {
+  globalRoomSection.innerHTML = roomsToDisplay.map(app => {
     return `
      <div style="position: relative; cursor: pointer;" class="app-item reveal" data-cmd="${app.cmd}" data-id="${app.id}" id="${app.id}">
           <div class="global-list-leftContent" style="display: flex; flex-direction: row; align-items: center; gap: 10px;">
@@ -219,7 +163,7 @@ const listProducts = async () => {
         `
   }).join('');
 
-  globalAppsSection.innerHTML = appsToDisplay.filter(app => !app.deleted).map(app => {
+  globalAppsSection.innerHTML = appsToDisplay.map(app => {
       const name = searchTerm ? highlightSearchTerm(app.name, searchTerm) : app.name;
       const cmd = searchTerm ? highlightSearchTerm(app.cmd, searchTerm) : app.cmd;
 
@@ -347,30 +291,6 @@ const runPearCommand = (cmd) => {
   notification(cmd, 'success');
 };
 
-// Adding the search functionality:
-document.getElementById('global--search').addEventListener('input', (e) => {
-  const searchQuery = e.target.value.trim();
-  if (searchQuery === 'hello') {
-    isAdmin = true;
-    console.log('Admin joined!!! : ', isAdmin);
-    document.getElementById('app-heading').innerText = 'Alaric.app Admin';
-    document.getElementById('dashboard--menu').classList.remove('hide');
-    document.getElementById('admin--page').classList.remove('hide');
-  }
-  listProducts(searchQuery);
-});
-
-document.getElementById('close--admin').addEventListener('click', (e) => {
-  e.preventDefault();
-  isAdmin = false;
-  console.log('Admin Left!!! : ', isAdmin);
-  document.getElementById('app-heading').innerText = 'Alaric.app';
-  document.getElementById('dashboard--menu').classList.add('hide');
-  document.getElementById('admin--page').classList.add('hide');
-
-  listProducts();
-})
-
 const addProduct = async (product, fromPeer = false) => {
   if (!globalApps.has(product.id)) {
     globalApps.set(product.id, product);
@@ -427,10 +347,6 @@ const joinSwarm = () => {
 };
 
 process.on('exit', cleanup);
-process.on('SIGTERM', cleanup);
-process.on('SIGHUP', cleanup);
-process.on('SIGINT', cleanup);
-process.on('uncaughtException', cleanup);
 
 const appDescription = document.getElementById('app-description');
 const charCount = document.getElementById("charCount");
@@ -502,7 +418,6 @@ const addApp = async () => {
     logo: logoBase64,
     link: appLink || 'https://github.com/Codesamp-Rohan',
     cmd: appCmd,
-    deleted: false,
   };  
 
   console.log(appLogo, appData);
@@ -627,7 +542,9 @@ const listPersonalApps = async () => {
   }
 
   const personalAppsSection = document.querySelector('#personal--page .personal--list--area');
-  document.querySelector('#personal-apps-no').innerHTML = personalApps.size;
+  const personalAppsNo = document.querySelector('#personal-apps-no');
+  personalAppsNo.innerHTML = personalApps.size;
+  document.querySelector('#dash-myApps-no').innerHTML = personalAppsNo.innerHTML;
 
   if (personalApps.size === 0) {
     personalAppsSection.innerHTML = `<p>No apps are yet added by you.</p>`;
@@ -775,20 +692,3 @@ const displayTrendingApps = () => {
 
 
 listProducts().then(displayTrendingApps);
-
-const deleteApp = async (appId) => {
-  if (!globalApps.has(appId)) return;
-
-  const deletedApp = {
-    ...globalApps.get(appId),
-    deleted: true, // Mark as deleted
-  };
-
-  console.log(deletedApp);
-
-  await feed.append(deletedApp); // Append delete marker
-  await feed.update(); // Ensure Hypercore syncs changes
-
-  listProducts(); // Refresh UI
-  notification('App deleted successfully!', 'success');
-};

@@ -133,9 +133,6 @@ body > h1:nth-of-ty(1) {
     /* gap: 15px; */
     font-weight: 900;
   }
-  li:hover .icon{
-    /* margin-left: 10px; */
-  }
   .dot{
     width: 3px;
     height: 70%;
@@ -849,3 +846,204 @@ td p{
   #trending--apps::-webkit-scrollbar {
     display: none; /* Hide scrollbar for Chrome, Safari */
   }
+
+  /* Dashboad */
+  .dashboard{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    height: 78vh;
+  }
+  .dash-myApps{
+    border-radius: 24px;
+    border: 2px solid #eee;
+    position: relative;
+    overflow: hidden;
+    padding: 1.5rem 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    background-color: #ffffff2b;
+  }
+  .dash-myApps::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('./assets/alaric.png');
+    background-position: center;
+    background-size: cover;
+    filter: blur(7px);
+    z-index: -1;
+}
+  .dash-local{
+    border-radius: 24px;
+    border: 2px solid #eee;
+    position: relative;
+    overflow: hidden;
+    padding: 1.5rem 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    background-color: #ffffff2b;
+
+  }
+  .dash-local::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('./assets/pearM.jpeg');
+    background-position: center;
+    background-size: cover;
+    filter: blur(7px);
+    z-index: -1;
+}
+  .dash-apps{
+    border-radius: 24px;
+    border: 2px solid #eee;
+    position: relative;
+    overflow: hidden;
+    padding: 1.5rem 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    /* background-color: #ffffff2b; */
+  }
+  .dash-apps::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('./assets/bg');
+    background-position: center;
+    background-size: cover;
+    filter: blur(7px);
+    z-index: -1;
+}
+  .dash-myGames{
+    /* background-color: #ffffff2b; */
+    width: 40%;
+    border-radius: 24px;
+    border: 2px solid #eee;
+    position: relative;
+    overflow: hidden;
+    padding: 1.5rem 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+  }
+  .dash-myGames::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('./assets/game.jpeg');
+    background-position: center;
+    background-size: cover;
+    filter: blur(7px);
+    z-index: -1;
+}
+
+  .dash-liveCrypto{
+    border-radius: 24px;
+    border: 2px solid #eee;
+    position: relative;
+    overflow: hidden;
+    padding: 1.5rem 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    /* background-color: #ffffff2b; */
+  }
+  .dash-liveCrypto::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('./assets/graph.jpeg');
+    background-position: center;
+    background-size: cover;
+    filter: blur(7px);
+    z-index: -1;
+}
+  .dash-addApp{
+    border-radius: 24px;
+    border: 2px solid #000;
+    position: relative;
+    overflow: hidden;
+    padding: 1.5rem 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #000000;
+    box-shadow: inset 0 0 20px #777;
+  }
+
+  .dashboard h1{
+    font-size: 14px;
+    text-align: center;
+    font-weight: 900;
+    color: #fff;
+  }
+  .dashboard p{
+    color: #ddd;
+    font-size: 10px;
+    font-weight: 900;
+    text-align: center;
+  }
+
+  .dash-myGames::after,  .dash-myApps::after,  .dash-local::after,  .dash-liveCrypto::after, .dash-apps::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    background: linear-gradient(to top, #00000045, transparent);
+    z-index: -1;
+  }
+
+  .dash-myApps,
+.dash-local,
+.dash-apps,
+.dash-myGames,
+.dash-liveCrypto {
+    cursor: pointer;
+    transition: 0.1s ease-in-out;
+    background: linear-gradient(45deg, #000, transparent);
+}
+
+.dash-myApps:hover,
+.dash-local:hover,
+.dash-apps:hover,
+.dash-myGames:hover,
+.dash-liveCrypto:hover,
+.dash-addApp:hover {
+    transform: scale(1.01);
+    box-shadow:  0 0 20px #bbb;
+}
+
+#dash-myApps-no, #dash-local-no, #dash-apps-no{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}

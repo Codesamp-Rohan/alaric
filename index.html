@@ -10,7 +10,7 @@
   <div id="bar"><pear-ctrl></pear-ctrl></div>
   <div class="blob1"></div>
   <div class="blob2"></div>
-  <p class="version">Build V7</p>
+  <p class="version">Build V8</p>
   <!-- <p id="price"></p> -->
   <main>
     <div class="notification">
@@ -36,7 +36,7 @@
             <p id="onlyGames-apps-no">0</p></li>
             <li><span class="dot dot-hide"></span><img src="./assets/crypto.png" class="icon" /><p>Live Crypto</p></li>
         <li><span class="dot dot-hide"></span><img src="./assets/add.png" class="icon" /><p>Add App</p></li>
-        <li id="dashboard--menu" class="hide"><span class="dot dot-hide"></span><img src="./assets/dashboard.png" class="icon" /><p>Dashboard</p><p id="admin-apps-no">0</p></li>
+        <li id="dashboard--menu"><span class="dot dot-hide"></span><img src="./assets/dashboard.png" class="icon" /><p>Dashboard</p></li>
       </ul>
       <ul>
         <li class="active"><span class="dot dot-hide"></span><img src="./assets/imp.png" class="icon" /><p>Alert Message</p></li>
@@ -175,14 +175,57 @@
             <p>Please enter every detail carefully. Do not play around.</p>
           </div> -->
       </section>
-      <!-- Admin Dashboard -->
-      <section class="page" id="admin--page">
-        <div style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999; border-radius: 10px; border: 1px solid #eee; background-color: #fff; padding-inline: 1rem;">
-          <p class="page--header">Admin Dashboard 🫵</p>
-          <button id="close--admin" style="background-color: rgba(255, 0, 0, 0.3);border: 1px solid red;color: red;border-radius: 6px;padding: 5px 10px;">Close</button>
-          </div>
-          <div class="list--area" style="overflow: visible !important;"></div>
-      </section>
+            <!-- Home Page -->
+            <section class="page hide" id="home--page">
+              <div  style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999;">
+                <p class="page--header">Dashboard</p>
+                </div>
+                <!-- <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; gap: 20px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                  <img id="home--img" style="width: 20%; object-fit: cover; border-radius: 10px;" src="./assets/alaric.png" />
+                  <h1>Welcome Back Alaricans!!!</h1>
+                  <p>Select any side-menu option to get started.</p>
+                </div> -->
+                <div style="display: flex; flex-direction: column; margin: 1rem;">
+                <div class="dashboard">
+                  <div style=" display: flex;gap: 10px;width: 100%; height: 100%;">
+                  <div style="display: flex; flex-direction: column; gap: 10px; width: 60%;">
+                    <div style="display: flex; gap: 10px;width: 100%; height: 100%;">
+                      <div class="dash-myApps" style="width: 100%;">
+                        <h1 id="dash-myApps-no">NAN</h1>
+                        <h1>My Apps</h1>
+                        <p>Apps added by you!!!</p>
+                      </div>
+                      <div class="dash-local" style="width: 100%;">
+                        <h1 id="dash-local-no">NAN</h1>
+                        <h1>System Pear Apps</h1>
+                        <p>All your system pear apps at once place</p>
+                      </div>
+                    </div>
+                    <div class="dash-apps" style="height: 100%;">
+                      <h1 id="dash-apps-no">NAN</h1>
+                      <h1>Apps Directories</h1>
+                      <p>Apps stacked and ready to launch.</p>
+                    </div>
+                  </div>
+                  <div class="dash-myGames">
+                    <h1>Only Games</h1>
+                    <p>Only for the Game Lovers </p>
+                  </div>
+                </div>
+
+                <div style="height: 40%; width: 100%; display: flex; gap: 10px;">
+                  <div class="dash-liveCrypto" style="width: 60%;">
+                    <h1>Live Cryptos</h1>
+                    <p>Always in sync with Bitcoin & more</p>
+                  </div>
+                  <div class="dash-addApp" style="width: 40%;">
+                    <h1 style="font-size: 32px;">+</h1>
+                  </div>
+                </div>
+                </div>
+
+              </div>
+            </section>
       <!-- Rules Page -->
       <section class="page hide" id="rules--page" style="padding-bottom: 1rem;">
           <div  style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999;">
@@ -220,17 +263,6 @@
             <a href="https://codesamprohan.me" target="_blank" class="active" style="width: fit-content; margin-top: 10px;"><img src="./assets/portfolio.png" style="width: 20px; height: 20px; padding: 0; background: #fff; border: 0; border-radius: 7px;" /><p>Portfolio</p></a>
             </ul>
       </section>
-      <!-- Home Page -->
-      <section class="page" id="home--page" class="hide">
-        <div  style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999;">
-          <p class="page--header">Hey there, How are you doing???</p>
-          </div>
-          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; gap: 20px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-            <img id="home--img" style="width: 20%; object-fit: cover; border-radius: 10px;" src="./assets/alaric.png" />
-            <h1>Welcome Back Alaricans!!!</h1>
-            <p>Select any side-menu option to get started.</p>
-          </div>
-      </section>
     </div>
   </main>
 </body>
@@ -239,28 +271,28 @@
 <script type="module" src="./notification.js"></script>
 <script type="module" src="./fileHandle.js"></script>
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-  // const pearImage = document.querySelector("img[src='./assets/A3.png']");
-  const pearImage = document.getElementById('home--img');
+//   document.addEventListener("DOMContentLoaded", () => {
+//   // const pearImage = document.querySelector("img[src='./assets/A3.png']");
+//   const pearImage = document.getElementById('home--img');
   
-  pearImage.style.transition = "transform 0.1s ease-out";
+//   pearImage.style.transition = "transform 0.1s ease-out";
 
-  document.addEventListener("mousemove", (event) => {
-    const rect = pearImage.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
+//   document.addEventListener("mousemove", (event) => {
+//     const rect = pearImage.getBoundingClientRect();
+//     const centerX = rect.left + rect.width / 2;
+//     const centerY = rect.top + rect.height / 2;
 
-    const offsetX = (event.clientX - centerX) / 10;
-    const offsetY = (event.clientY - centerY) / 10;
+//     const offsetX = (event.clientX - centerX) / 10;
+//     const offsetY = (event.clientY - centerY) / 10;
 
-    pearImage.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
-  });
+//     pearImage.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+//   });
 
-  document.addEventListener("mouseleave", () => {
-    pearImage.style.transform = "translate(0, 0)";
-  });
+//   document.addEventListener("mouseleave", () => {
+//     pearImage.style.transform = "translate(0, 0)";
+//   });
 
-});
+// });
 
 </script>
 </html>

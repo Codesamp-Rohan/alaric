@@ -167,7 +167,9 @@ async function loadPermits() {
               `;
 
               displayedCount++;
-              document.querySelector('#local-apps-no').innerHTML = displayedCount;
+              const localAppsNo = document.querySelector('#local-apps-no');
+              localAppsNo.innerHTML = displayedCount;
+              document.querySelector('#dash-local-no').innerHTML = localAppsNo.innerHTML;
               listArea.appendChild(permitDiv);
             }
           } catch (err) {

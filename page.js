@@ -27,11 +27,30 @@ document.addEventListener("DOMContentLoaded", () => {
   menuItems.forEach((item, index) => {
     item.addEventListener("click", () => {
       togglePage(index);
-      document.querySelector("#home--page").classList.add("hide");
     });
   });
 
   // Show the home page initially
   document.querySelector("#home--page").classList.remove("hide");
-  togglePage();
+  togglePage(7); // Default to Dashboard
+
+  // ** Dashboard Click Events **
+  const dashboardLinks = {
+    ".dash-myApps": 0, // My Apps
+    ".dash-local": 1, // System Pear Apps
+    ".dash-apps": 2, // Apps Directory
+    ".dash-myGames": 4, // Only Games
+    ".dash-liveCrypto": 5, // Live Crypto
+    ".dash-addApp": 6, // Add App
+  };
+
+  Object.entries(dashboardLinks).forEach(([selector, index]) => {
+    const element = document.querySelector(selector);
+    if (element) {
+      element.style.cursor = "pointer";
+      element.addEventListener("click", () => {
+        togglePage(index);
+      });
+    }
+  });
 });
