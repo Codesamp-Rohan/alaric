@@ -10,7 +10,7 @@
   <div id="bar"><pear-ctrl></pear-ctrl></div>
   <div class="blob1"></div>
   <div class="blob2"></div>
-  <p class="version">Build V8</p>
+  <p class="version">Build V10</p>
   <!-- <p id="price"></p> -->
   <main>
     <div class="notification">
@@ -82,7 +82,7 @@
       <!-- Apps Directory / Global Apps -->
       <section class="page hide" id="global--page">
         <div  style="display: flex;flex-direction: row;justify-content: space-between;align-items: center;width: 100%;position: sticky;top: 0;z-index: 99;background-color: #fff;border: 1px solid #eee;padding-inline: 10px;border-radius: 12px;">
-          <p class="page--header">Global Apps</p>
+          <p class="page--header">Apps Directory</p>
           <div style="display: flex; align-items: center; gap: 10px;">
             <input type="text" style="margin-top: 0;border-radius: 5px;padding: 10px; width: 260px;" id="global--search" placeholder="Search the App" />
           <div class="dropdown">
@@ -93,7 +93,7 @@
               <a href="#" id="sortByNewest"><img src="./assets/newest.png" style="width: 10px;" />Newest</a>
             </div>
           </div>         
-          <button class="button" id="reload--app" style="width: fit-content;font-size: 10px;font-weight: 900;margin-top: 0; color: #fff; background-color: #000;border-radius: 5px;">Reload App</button>
+          <button class="button reload--app" style="width: fit-content;font-size: 10px;font-weight: 900;margin-top: 0; color: #fff; background-color: #000;border-radius: 5px;">Reload App</button>
           </div>
           </div>
           <!-- <p id="global-msg">No Global apps added yet!!!</p> -->
@@ -102,8 +102,20 @@
       </section>
       <!-- Room Page -->
       <section class="page" id="room--page">
-        <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 99; border: 1px solid #eee; background-color: #fff; border-radius: 10px;">
-          <p class="page--header" style="gap: 8px;">Rooms</p>
+        <div  style="display: flex;flex-direction: row;justify-content: space-between;align-items: center;width: 100%;position: sticky;top: 0;z-index: 99;background-color: #fff;border: 1px solid #eee;padding-inline: 10px;border-radius: 12px;">
+          <p class="page--header">Rooms Directory</p>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <input type="text" style="margin-top: 0;border-radius: 5px;padding: 10px; width: 260px;" id="room--search" placeholder="Search the App" />
+          <div class="dropdown">
+            <button class="dropbtn"><img src="./assets/sort.png" style="width: 8px;" />Sort By</button>
+            <div class="dropdown-content">
+              <a href="#" id="sortRoomByOldest"><img src="./assets/oldest.png" style="width: 10px;" />Oldest</a>
+              <a href="#" id="sortRoomByName"><img src="./assets/name.png" style="width: 10px;" />Name</a>
+              <a href="#" id="sortRoomByNewest"><img src="./assets/newest.png" style="width: 10px;" />Newest</a>
+            </div>
+          </div>         
+          <button class="button reload--app" style="width: fit-content;font-size: 10px;font-weight: 900;margin-top: 0; color: #fff; background-color: #000;border-radius: 5px;">Reload App</button>
+          </div>
           </div>
           <div class="list--area">
           </div>
@@ -188,38 +200,66 @@
                 <div style="display: flex; flex-direction: column; margin: 1rem;">
                 <div class="dashboard">
                   <div style=" display: flex;gap: 10px;width: 100%; height: 100%;">
-                  <div style="display: flex; flex-direction: column; gap: 10px; width: 60%;">
+                  <div style="display: flex; flex-direction: column; gap: 10px; width: 70%;">
                     <div style="display: flex; gap: 10px;width: 100%; height: 100%;">
                       <div class="dash-myApps" style="width: 100%;">
-                        <h1 id="dash-myApps-no">NAN</h1>
+                        <div class="top--data">
+                          <img src="./assets/myApps.png" style="width: 30px; height: 30px;" />
+                          <h1 id="dash-myApps-no" style="padding-right: 6px;">00</h1>
+                        </div>
                         <h1>My Apps</h1>
                         <p>Apps added by you!!!</p>
+                        <button class="button">🫵 apps added by you</button>
                       </div>
                       <div class="dash-local" style="width: 100%;">
-                        <h1 id="dash-local-no">NAN</h1>
+                        <div class="top--data">
+                          <img src="./assets/installed.png" style="width: 30px; height: 30px;" />
+                          <h1 id="dash-local-no" style="padding-right: 6px;">00</h1>
+                        </div>
                         <h1>System Pear Apps</h1>
                         <p>All your system pear apps at once place</p>
+                        <button class="button">📍 all local pears</button>
                       </div>
                     </div>
                     <div class="dash-apps" style="height: 100%;">
-                      <h1 id="dash-apps-no">NAN</h1>
+                      <div class="top--data">
+                        <img src="./assets/apps.png" style="width: 30px; height: 30px;" />
+                        <h1 id="dash-apps-no" style="padding-right: 6px;">00</h1>
+                      </div>
                       <h1>Apps Directories</h1>
                       <p>Apps stacked and ready to launch.</p>
+                      <button class="button"><img src="./assets/alaricBG.png" class="icon" style="filter: invert(0);width: 14px;height: 14px;" /> global apps added by alaricans</button>
                     </div>
                   </div>
                   <div class="dash-myGames">
+                    <div class="top--data">
+                      <img src="./assets/ghost.png" style="width: 30px; height: 30px;" />
+                      <h1 id="dash-myApps-no" style="padding-right: 6px;">00</h1>
+                    </div>
                     <h1>Only Games</h1>
                     <p>Only for the Game Lovers </p>
+                    <button class="button"><img src="./assets/game.png" class="icon" /> LAN games</button>
                   </div>
                 </div>
 
                 <div style="height: 40%; width: 100%; display: flex; gap: 10px;">
-                  <div class="dash-liveCrypto" style="width: 60%;">
+                  <div class="dash-liveCrypto" style="width: 70%;">
+                    <div class="top--data">
+                      <img src="./assets/graph.png" style="width: 30px; height: 30px;" />
+                      <h1 id="dash-myApps-no" style="padding-right: 6px;">06</h1>
+                    </div>
                     <h1>Live Cryptos</h1>
                     <p>Always in sync with Bitcoin & more</p>
+                    <button class="button">🪙 time for some crypto</button>
                   </div>
-                  <div class="dash-addApp" style="width: 40%;">
-                    <h1 style="font-size: 32px;">+</h1>
+                  <div class="dash-addApp" style="width: 30%;">
+                    <div class="top--data">
+                      <img src="./assets/addDash.png" style="width: 30px; height: 30px;" />
+                      <h1 id="dash-myApps-no" style="padding-right: 6px;">00</h1>
+                    </div>
+                    <h1>Add App/Room</h1>
+                    <p>Why not share the cool stuffs?</p>
+                    <button class="button">+ click to add</button>
                   </div>
                 </div>
                 </div>

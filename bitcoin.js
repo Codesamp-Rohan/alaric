@@ -61,11 +61,11 @@ const cryptos = [
                       datasets: [{
                           label: symbol.replace('USDT', ''),
                           data: prices,
-                          borderColor: `${percentChange >= 0 ? '#26ff00' : '#ff0000'}`,
+                          borderColor: `${percentChange >= 0 ? '#1bb600' : '#ff0000'}`,
                           borderWidth: 7,
                           fill: false,
-                          pointRadius: 1,
-                          tension: 0.1
+                          pointRadius: 0,
+                          tension: 0.2
                       }]
                   },
                   options: {

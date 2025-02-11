@@ -34,22 +34,9 @@ let personalAppFeed = new Hypercore(Pear.config.storage + './personalApp', {
 
 // Function to highlight search term
 const highlightSearchTerm = (text, searchTerm) => {
-  if (!searchTerm) return text;
+  if (!searchTerm || !text) return text || ''; // Return an empty string if text is falsy
   const regex = new RegExp(`(${searchTerm})`, 'gi');
   return text.replace(regex, '<span class="highlight">$1</span>');
-};
-
-const sortApps = (apps) => {
-  return apps.sort((a, b) => {
-    const nameA = a.name.toLowerCase();
-    const nameB = b.name.toLowerCase();
-
-    if (sortOrder === 'asc') {
-      return nameA < nameB ? -1 : 1;
-    } else {
-      return nameA > nameB ? -1 : 1;
-    }
-  });
 };
 
 const cleanup = async () => {
@@ -77,6 +64,24 @@ document.getElementById('sortByOldest').addEventListener('click', (e) => {
   listProducts();
 });
 
+document.getElementById('sortRoomByName').addEventListener('click', (e) => {
+  e.preventDefault();
+  sortOrder = 'asc';
+  listProducts();
+});
+
+document.getElementById('sortRoomByNewest').addEventListener('click', (e) => {
+  e.preventDefault();
+  sortOrder = 'newest';
+  listProducts();
+});
+
+document.getElementById('sortRoomByOldest').addEventListener('click', (e) => {
+  e.preventDefault();
+  sortOrder = 'oldest';
+  listProducts();
+});
+
 const listProducts = async () => {
   await feed.update();
   globalApps.clear();
@@ -96,19 +101,39 @@ const listProducts = async () => {
 
   document.querySelector('#rooms-apps-no').innerHTML = Array.from(globalApps.values()).filter(app => app.appType === 'room').length;
   const searchTerm = document.getElementById('global--search').value.trim().toLowerCase();
-
+  const roomSearch = document.getElementById('room--search').value.trim().toLowerCase();
+  console.log("Room search term:", roomSearch);  
 
   let appsToDisplay = Array.from(globalApps.values()).filter(app => app.appType !== 'room');
   let roomsToDisplay = Array.from(globalApps.values()).filter(app => app.appType === 'room');
 
   if (searchTerm) {
-    appsToDisplay = appsToDisplay.filter(app => 
-      app.name.toLowerCase().includes(searchTerm) || app.cmd.toLowerCase().includes(searchTerm)
-    );
-    appsToDisplay = sortApps(appsToDisplay);
-  }   
+    appsToDisplay = appsToDisplay.filter(app => {
+      const appName = app.name?.toLowerCase() || "";
+      const appCmd = app.cmd?.toLowerCase() || "";
+      return appName.includes(searchTerm) || appCmd.includes(searchTerm);
+    });
+  } 
+  if (roomSearch) {
+    console.log(roomSearch);
+    roomsToDisplay = roomsToDisplay.filter(app => {
+      const appName = app.name?.toLowerCase() || "";
+      const appCmd = app.cmd?.toLowerCase() || "";
+      return appName.includes(roomSearch) || appCmd.includes(roomSearch);
+    });    
+  }  
 
   appsToDisplay = appsToDisplay.sort((a, b) => {
+    if (sortOrder === 'asc') {
+      return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
+    } else if (sortOrder === 'newest') {
+      return b.createAt - a.createAt ;
+    } else if (sortOrder === 'oldest') {
+      return a.createAt - b.createAt;
+    }
+    return 0;
+  });
+  roomsToDisplay = roomsToDisplay.sort((a, b) => {
     if (sortOrder === 'asc') {
       return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
     } else if (sortOrder === 'newest') {
@@ -124,8 +149,11 @@ const listProducts = async () => {
 // </button>  
 
   globalRoomSection.innerHTML = roomsToDisplay.map(app => {
+    const name = roomSearch ? highlightSearchTerm(app.name, roomSearch) : app.name;
+    const cmd = roomSearch ? highlightSearchTerm(app.cmd, roomSearch) : app.cmd;
+
     return `
-     <div style="position: relative; cursor: pointer;" class="app-item reveal" data-cmd="${app.cmd}" data-id="${app.id}" id="${app.id}">
+     <div style="position: relative; cursor: pointer;" class="app-item reveal" data-cmd="${cmd}" data-id="${app.id}" id="${app.id}">
           <div class="global-list-leftContent" style="display: flex; flex-direction: row; align-items: center; gap: 10px;">
             <div class="list--running hide"></div>
             <img 
@@ -134,7 +162,7 @@ const listProducts = async () => {
               alt="App Logo"/>
             <div style="width: 100%; display: flex; flex-direction: column;">
               <div style="display: flex; gap: 10px; align-items: center;">
-                <p style="color: #333; font-size: 18px; font-weight: 900;"><strong>${app.name}</strong></p>
+                <p style="color: #333; font-size: 18px; font-weight: 900;"><strong>${name}</strong></p>
                 <p style="font-size: 11px; font-weight: 900; color: #247538; white-space: nowrap;">${app.appType}</p>
                   <p style="font-size: 11px; font-weight: 900; color: #247538; white-space: nowrap;">|</p>
                  <p style="font-size: 9px; font-weight: 900; color: #247538; white-space: nowrap;">${formatDate(app.createAt)}</p>
@@ -142,7 +170,7 @@ const listProducts = async () => {
                  <img src="./assets/link.png" style="width: 11px; height: 11px;" />
                  </a>
               </div>
-              <p style="font-weight: 100; color: #777; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%; font-size: 14px;">${app.appDescription ? app.appDescription : app.cmd}</p>
+              <p style="font-weight: 100; color: #777; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%; font-size: 14px;">${app.appDescription ? app.appDescription : cmd}</p>
             </div>
           </div>
           <div class="list--side--menu">
@@ -262,6 +290,8 @@ const listProducts = async () => {
   });
 };
 
+document.getElementById('global--search').addEventListener('input', listProducts);
+document.getElementById('room--search').addEventListener('input', listProducts);
 
 const runPearCommand = (cmd) => {
   const parentItem = document.querySelector(`.app-item[data-cmd="${cmd}"]`);
@@ -442,7 +472,17 @@ process.on('SIGINT', async () => {
 
 joinSwarm();
 document.getElementById('submit-btn').addEventListener('click', addApp);
-document.getElementById('reload--app').addEventListener('click', listProducts);
+const reloadApp = () => {
+  console.log('Reloading...');
+  feed.close();
+  personalAppFeed.close();
+  Pear.reload();
+}
+
+document.querySelectorAll('.reload--app').forEach(reloadBtn => {
+  reloadBtn.addEventListener('click', () => reloadApp());
+});
+
 
 const openHolesailPopUp = (parentId, appCmd) => {
   document.querySelector('.overlay').classList.remove('hide');

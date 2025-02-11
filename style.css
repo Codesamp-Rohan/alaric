@@ -39,7 +39,7 @@ body > h1:nth-of-ty(1) {
   width: 200px;
   height: 200px;
   background-color: #5d55f1;
-  filter: blur(100px) opacity(0.3);
+  filter: blur(100px) opacity(0.4);
   position: fixed;
   top: 0;
   right: 0;
@@ -48,8 +48,8 @@ body > h1:nth-of-ty(1) {
 .blob2{
   width: 200px;
   height: 200px;
-  background-color: #f18955;
-  filter: blur(100px) opacity(0.3);
+  background-color: #f334fa;
+  filter: blur(100px) opacity(0.4);
   position: fixed;
   top: 30%;
   right: 0;
@@ -661,10 +661,10 @@ th{
     display: unset;
 }
 .green-percent{
-  color: #26ff00;
-    background-color: #26ff0029;
+  color: #1bb600;
+    background-color: #1bb60029;
     font-weight: 900;
-    border: 1px solid #26ff00;
+    border: 1px solid #1bb600;
     width: fit-content;
     padding: 3px 10px;
     border-radius: 5px;
@@ -856,15 +856,6 @@ td p{
     height: 78vh;
   }
   .dash-myApps{
-    border-radius: 24px;
-    border: 2px solid #eee;
-    position: relative;
-    overflow: hidden;
-    padding: 1.5rem 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-end;
     background-color: #ffffff2b;
   }
   .dash-myApps::before {
@@ -881,15 +872,6 @@ td p{
     z-index: -1;
 }
   .dash-local{
-    border-radius: 24px;
-    border: 2px solid #eee;
-    position: relative;
-    overflow: hidden;
-    padding: 1.5rem 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-end;
     background-color: #ffffff2b;
 
   }
@@ -907,15 +889,6 @@ td p{
     z-index: -1;
 }
   .dash-apps{
-    border-radius: 24px;
-    border: 2px solid #eee;
-    position: relative;
-    overflow: hidden;
-    padding: 1.5rem 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-end;
     /* background-color: #ffffff2b; */
   }
   .dash-apps::before {
@@ -933,16 +906,7 @@ td p{
 }
   .dash-myGames{
     /* background-color: #ffffff2b; */
-    width: 40%;
-    border-radius: 24px;
-    border: 2px solid #eee;
-    position: relative;
-    overflow: hidden;
-    padding: 1.5rem 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-end;
+    width: 30%;
   }
   .dash-myGames::before {
     content: "";
@@ -959,15 +923,6 @@ td p{
 }
 
   .dash-liveCrypto{
-    border-radius: 24px;
-    border: 2px solid #eee;
-    position: relative;
-    overflow: hidden;
-    padding: 1.5rem 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-end;
     /* background-color: #ffffff2b; */
   }
   .dash-liveCrypto::before {
@@ -984,11 +939,11 @@ td p{
     z-index: -1;
 }
   .dash-addApp{
-    border-radius: 24px;
+    border-radius: 14px;
     border: 2px solid #000;
     position: relative;
     overflow: hidden;
-    padding: 1.5rem 10px;
+    padding: 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -999,15 +954,15 @@ td p{
 
   .dashboard h1{
     font-size: 14px;
-    text-align: center;
     font-weight: 900;
     color: #fff;
+    padding-left: 6px;
   }
   .dashboard p{
     color: #ddd;
     font-size: 10px;
     font-weight: 900;
-    text-align: center;
+    padding-left: 6px;
   }
 
   .dash-myGames::after,  .dash-myApps::after,  .dash-local::after,  .dash-liveCrypto::after, .dash-apps::after {
@@ -1027,23 +982,67 @@ td p{
 .dash-myGames,
 .dash-liveCrypto {
     cursor: pointer;
-    transition: 0.1s ease-in-out;
-    background: linear-gradient(45deg, #000, transparent);
+    transition: 0.2s ease-in-out;
+    background: linear-gradient(45deg, #000000bf, transparent);
+    border-radius: 14px;
+    border: 2px solid #eee;
+    position: relative;
+    overflow: hidden;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-end;
 }
 
 .dash-myApps:hover,
 .dash-local:hover,
 .dash-apps:hover,
 .dash-myGames:hover,
-.dash-liveCrypto:hover,
-.dash-addApp:hover {
+.dash-liveCrypto:hover{
     transform: scale(1.01);
     box-shadow:  0 0 20px #bbb;
 }
 
 #dash-myApps-no, #dash-local-no, #dash-apps-no{
+  font-size: 16px;
+    font-weight: 100;
+    color: #bbb;
+}
+.dash-addApp{
+  cursor: pointer;
+  background: #000;
+  border-radius: 14px;
+  border: 2px solid #eee;
+  position: relative;
+  overflow: hidden;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end; 
+}
+.dashboard .button{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+.dashboard .icon{
+  width: 10px;
+  height: 10px;
+  filter: invert(1);
+}
+.top--data{
+  box-shadow: inset 0 0 10px #777;
+  display: flex;
+  flex-direction: row;
+  border: 1px solid #444;
+  border-radius: 7px;
+  padding: 3px;
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  top: 10px;
+  left: 10px;
+  background-color: #1111119d;
+  align-items: center;
 }

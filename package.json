@@ -5,7 +5,7 @@
     "name": "alaric",
     "type": "desktop",
     "gui": {
-      "backgroundColor": "#1F2430",
+      "backgroundColor": "#1F243045",
       "height": "800",
       "width": "1040"
     },
