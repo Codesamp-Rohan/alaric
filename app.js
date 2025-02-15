@@ -34,10 +34,11 @@ let personalAppFeed = new Hypercore(Pear.config.storage + './personalApp', {
 
 // Function to highlight search term
 const highlightSearchTerm = (text, searchTerm) => {
-  if (!searchTerm || !text) return text || ''; // Return an empty string if text is falsy
-  const regex = new RegExp(`(${searchTerm})`, 'gi');
+  if (!searchTerm || !text) return text || ''; 
+  const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
   return text.replace(regex, '<span class="highlight">$1</span>');
 };
+
 
 const cleanup = async () => {
   console.log("Closing connections...");
@@ -96,10 +97,23 @@ const listProducts = async () => {
   const globalRoomSection = document.querySelector('#room--page .list--area');
   
   const globalAppsNo = document.querySelector('#global-apps-no');
-  globalAppsNo.innerHTML = Array.from(globalApps.values()).filter(app => app.appType !== 'room').length;
+  const appCount = Array.from(globalApps.values()).filter(app => app.appType !== 'room').length;
+  console.log(appCount);
+  globalAppsNo.innerHTML = appCount;
   document.querySelector('#dash-apps-no').innerHTML = globalAppsNo.innerHTML;
+  if(appCount === 0){
+    document.getElementById('global-msg').classList.remove('hide');
+  } else {
+    document.getElementById('global-msg').classList.add('hide');
+  }
 
-  document.querySelector('#rooms-apps-no').innerHTML = Array.from(globalApps.values()).filter(app => app.appType === 'room').length;
+  const roomCount = Array.from(globalApps.values()).filter(app => app.appType === 'room').length;
+  document.querySelector('#rooms-apps-no').innerHTML = roomCount;
+  if(roomCount === 0){
+    document.getElementById('room-msg').classList.remove('hide');
+  } else {
+    document.getElementById('room-msg').classList.add('hide');
+  }
   const searchTerm = document.getElementById('global--search').value.trim().toLowerCase();
   const roomSearch = document.getElementById('room--search').value.trim().toLowerCase();
   console.log("Room search term:", roomSearch);  
@@ -153,7 +167,7 @@ const listProducts = async () => {
     const cmd = roomSearch ? highlightSearchTerm(app.cmd, roomSearch) : app.cmd;
 
     return `
-     <div style="position: relative; cursor: pointer;" class="app-item reveal" data-cmd="${cmd}" data-id="${app.id}" id="${app.id}">
+     <div style="position: relative; cursor: pointer;" class="app-item reveal" data-cmd="${app.cmd}" data-id="${app.id}" id="${app.id}">
           <div class="global-list-leftContent" style="display: flex; flex-direction: row; align-items: center; gap: 10px;">
             <div class="list--running hide"></div>
             <img 

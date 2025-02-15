@@ -709,8 +709,8 @@ td p{
     opacity: 1 !important;
     scale: 1 !important;
   }
-  #global-msg{
-    margin: 1rem;
+  #global-msg, #room-msg{
+    margin: 2rem 1rem 1rem 1rem;
   }
 
   #global--popUp{
@@ -1000,8 +1000,7 @@ td p{
 .dash-apps:hover,
 .dash-myGames:hover,
 .dash-liveCrypto:hover{
-    transform: scale(1.01);
-    box-shadow:  0 0 20px #bbb;
+  background: linear-gradient(45deg, #0000006d, transparent);
 }
 
 #dash-myApps-no, #dash-local-no, #dash-apps-no{
