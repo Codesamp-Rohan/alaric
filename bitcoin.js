@@ -49,7 +49,7 @@ const cryptos = [
               
               let canvas = document.createElement('canvas');
               canvas.style.width = '70px';
-              canvas.style.height = '40px';
+              canvas.style.height = '30px';
               chartContainer.appendChild(canvas);
               graphCell.appendChild(chartContainer);
               row.appendChild(graphCell);

@@ -192,7 +192,7 @@ body > h1:nth-of-ty(1) {
     padding: 1rem;
     position: absolute;
     top: 50%;
-    width: 70%;
+    width: 90%;
     display: flex;
     flex-direction: column;
     left: 50%;
