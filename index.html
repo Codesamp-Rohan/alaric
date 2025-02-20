@@ -10,7 +10,7 @@
   <div id="bar"><pear-ctrl></pear-ctrl></div>
   <div class="blob1"></div>
   <div class="blob2"></div>
-  <p class="version">Build V12</p>
+  <p class="version">Build V14</p>
   <!-- <p id="price"></p> -->
   <main>
     <div class="notification">
@@ -24,6 +24,7 @@
       <div style="display: flex; align-items: center; gap: 4px;"><img src="./assets/alaric.png" style="width: 40px; height: 40px;" /><h1 id="app-heading">Alaric.app</h1></div>
       <div style="display: flex; flex-direction: column; justify-content: space-between; width: 100%; height: 93%;">
       <ul style="margin-top: 2rem;">
+        <li id="dashboard--menu"><span class="dot dot-hide"></span><img src="./assets/dashboard.png" class="icon" /><p>Dashboard</p></li>
         <li><span class="dot dot-hide"></span><img src="./assets/my.png" class="icon" /><p>My Apps</p>
           <p id="personal-apps-no">0</p></li>
         <li><span class="dot dot-hide"></span><img src="./assets/install.png" class="icon" /><p>System Pear Apps</p>
@@ -31,12 +32,11 @@
         <li><span class="dot dot-hide"></span><img src="./assets/directory.png" class="icon" /><p>Apps Directory</p>
           <p id="global-apps-no">0</p></li>
           <li><span class="dot dot-hide"></span><img src="./assets/room.png" class="icon" /><p>Rooms</p>
-            <p id="rooms-apps-no">0</p></li>
+            <p id="global-rooms-no">0</p></li>
           <li><span class="dot dot-hide"></span><img src="./assets/game.png" class="icon" /><p>OnlyGames</p>
             <p id="onlyGames-apps-no">0</p></li>
             <li><span class="dot dot-hide"></span><img src="./assets/crypto.png" class="icon" /><p>Live Crypto</p></li>
         <li><span class="dot dot-hide"></span><img src="./assets/add.png" class="icon" /><p>Add App</p></li>
-        <li id="dashboard--menu"><span class="dot dot-hide"></span><img src="./assets/dashboard.png" class="icon" /><p>Dashboard</p></li>
       </ul>
       <ul>
         <li class="active"><span class="dot dot-hide"></span><img src="./assets/imp.png" class="icon" /><p>Alert Message</p></li>
@@ -49,6 +49,60 @@
       <div id="global--popUp" class="hide">
         <div id="popUp--pearContent"></div>
       </div>
+      <!-- Home Page -->
+       <section class="page hide" id="home--page">
+        <div  style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999;">
+              <p class="page--header">Dashboard</p>
+              </div>
+              <div style="display: flex; flex-direction: column; margin: 1rem;">
+              <div class="dashboard">
+                <div style=" display: flex;gap: 10px;width: 100%; height: 100%;">
+                <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+                  <div style="display: flex; gap: 10px;width: 100%; height: 30%;">
+                    <div class="dash-myApps" style="width: 100%;">
+                      <div class="top--data">
+                        <img src="./assets/myApps.png" style="width: 30px; height: 30px;" />
+                        <h1 id="dash-myApps-no" style="padding-right: 6px;">00</h1>
+                      </div>
+                      <h1>My Apps</h1>
+                      <p>Apps added by you!!!</p>
+                      <button class="button">apps added by you</button>
+                    </div>
+                    <div class="dash-local" style="width: 100%;">
+                      <div class="top--data">
+                        <img src="./assets/installed.png" style="width: 30px; height: 30px;" />
+                        <h1 id="dash-local-no" style="padding-right: 6px;">00</h1>
+                      </div>
+                      <h1>System Pear Apps</h1>
+                      <p>All your system pear at once place</p>
+                      <button class="button">local system pears</button>
+                    </div>
+                  </div>
+                  <div style="display: flex; gap: 10px;width: 100%; height: 30%;">
+                    <div class="dash-apps" style="width: 100%;">
+                      <div class="top--data">
+                        <img src="./assets/apps.png" style="width: 30px; height: 30px;" />
+                        <h1 id="dash-apps-no" style="padding-right: 6px;">00</h1>
+                      </div>
+                      <h1>Apps Directories</h1>
+                      <p>Apps stacked and ready to launch.</p>
+                      <button class="button">apps added by alaricans</button>
+                    </div>
+                    <div class="dash-rooms" style="width: 100%;">
+                      <div class="top--data">
+                        <img src="./assets/dashRoom.png" style="width: 30px; height: 30px;" />
+                        <h1 id="dash-rooms-no" style="padding-right: 6px;">00</h1>
+                      </div>
+                      <h1>Rooms Directories</h1>
+                      <p>Keet Rooms stacked and ready to launch.</p>
+                      <button class="button">rooms added by alaricans</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
       <!-- Personal Apps -->
       <section class="page" id="personal--page">
         <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999; border-radius: 10px; border: 1px solid #eee; background-color: #fff;">
@@ -129,6 +183,7 @@
           <div class="list--area">
             <p>Only Games coming SOON!!!</p>
           </div>
+          <img style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 40px;" src="./assets/jesus.gif" alt="GIF Animation">
       </section>
       <!-- Live Crypto -->
       <section class="page" id="onlyGames--page">
@@ -184,91 +239,15 @@
                 <option value="room">Room</option>
                 <option value="other">Other</option>
               </select>
-            <button type="button" id="submit-btn" class="button">Submit</button>
+              <div style="display: flex; gap: 4px; align-items: center;">
+                <button class="button form-close-button" style="background-color: #ff1a1a;    box-shadow: inset 0 0 20px #fff">close</button>
+                <button type="button" id="submit-btn" class="button">Submit</button>
+              </div>
           </form>
           <!-- <div style="position: fixed;top: 76%;right: -4.5%;transform: translate(-50%, -50%);color: #ff000085;font-weight: bolder;padding: 10px;background: #8b000017;border: 1px solid;border-radius: 5px;">
             <p>Please enter every detail carefully. Do not play around.</p>
           </div> -->
       </section>
-            <!-- Home Page -->
-            <section class="page hide" id="home--page">
-              <div  style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999;">
-                <p class="page--header">Dashboard</p>
-                </div>
-                <!-- <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; gap: 20px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-                  <img id="home--img" style="width: 20%; object-fit: cover; border-radius: 10px;" src="./assets/alaric.png" />
-                  <h1>Welcome Back Alaricans!!!</h1>
-                  <p>Select any side-menu option to get started.</p>
-                </div> -->
-                <div style="display: flex; flex-direction: column; margin: 1rem;">
-                <div class="dashboard">
-                  <div style=" display: flex;gap: 10px;width: 100%; height: 100%;">
-                  <div style="display: flex; flex-direction: column; gap: 10px; width: 70%;">
-                    <div style="display: flex; gap: 10px;width: 100%; height: 100%;">
-                      <div class="dash-myApps" style="width: 100%;">
-                        <div class="top--data">
-                          <img src="./assets/myApps.png" style="width: 30px; height: 30px;" />
-                          <h1 id="dash-myApps-no" style="padding-right: 6px;">00</h1>
-                        </div>
-                        <h1>My Apps</h1>
-                        <p>Apps added by you!!!</p>
-                        <button class="button">🫵 apps added by you</button>
-                      </div>
-                      <div class="dash-local" style="width: 100%;">
-                        <div class="top--data">
-                          <img src="./assets/installed.png" style="width: 30px; height: 30px;" />
-                          <h1 id="dash-local-no" style="padding-right: 6px;">00</h1>
-                        </div>
-                        <h1>System Pear Apps</h1>
-                        <p>All your system pear apps at once place</p>
-                        <button class="button">📍 system pears</button>
-                      </div>
-                    </div>
-                    <div class="dash-apps" style="height: 100%;">
-                      <div class="top--data">
-                        <img src="./assets/apps.png" style="width: 30px; height: 30px;" />
-                        <h1 id="dash-apps-no" style="padding-right: 6px;">00</h1>
-                      </div>
-                      <h1>Apps Directories</h1>
-                      <p>Apps stacked and ready to launch.</p>
-                      <button class="button"><img src="./assets/alaricBG.png" class="icon" style="filter: invert(0);width: 14px;height: 14px;" />apps added by alaricans</button>
-                    </div>
-                  </div>
-                  <div class="dash-myGames">
-                    <div class="top--data">
-                      <img src="./assets/ghost.png" style="width: 30px; height: 30px;" />
-                      <h1 id="dash-myApps-no" style="padding-right: 6px;">00</h1>
-                    </div>
-                    <h1>Only Games</h1>
-                    <p>Only for the Game Lovers </p>
-                    <button class="button"><img src="./assets/game.png" class="icon" /> LAN games</button>
-                  </div>
-                </div>
-
-                <div style="height: 40%; width: 100%; display: flex; gap: 10px;">
-                  <div class="dash-liveCrypto" style="width: 70%;">
-                    <div class="top--data">
-                      <img src="./assets/graph.png" style="width: 30px; height: 30px;" />
-                      <h1 id="dash-myApps-no" style="padding-right: 6px;">06</h1>
-                    </div>
-                    <h1>Live Cryptos</h1>
-                    <p>Always in sync with Bitcoin & more</p>
-                    <button class="button">check out</button>
-                  </div>
-                  <div class="dash-addApp" style="width: 30%;">
-                    <div class="top--data">
-                      <img src="./assets/addDash.png" style="width: 30px; height: 30px;" />
-                      <h1 id="dash-myApps-no" style="padding-right: 6px;">00</h1>
-                    </div>
-                    <h1>Add App/Room</h1>
-                    <p>Why not share the cool stuffs?</p>
-                    <button class="button">click to add</button>
-                  </div>
-                </div>
-                </div>
-
-              </div>
-            </section>
       <!-- Rules Page -->
       <section class="page hide" id="rules--page" style="padding-bottom: 1rem;">
           <div  style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999;">
@@ -303,7 +282,7 @@
             </ul>
             <ul class="social--links">
             <a class="active" style="width: fit-content; margin-top: 10px;"><img src="./assets/instagram.png" style="width: 20px; height: 20px; padding: 0; background: #fff; border: 0; border-radius: 7px;" /><p>Instagram</p></a>
-            <a href="https://codesamprohan.me" target="_blank" class="active" style="width: fit-content; margin-top: 10px;"><img src="./assets/portfolio.png" style="width: 20px; height: 20px; padding: 0; background: #fff; border: 0; border-radius: 7px;" /><p>Portfolio</p></a>
+            <a href="https://codesamprohan.me" target="_blank" class="active" style="width: fit-content; margin-top: 10px;"><img src="./assets/about.png" style="width: 20px; height: 20px; padding: 0; background: #fff; border: 0; border-radius: 7px;" /><p>Portfolio</p></a>
             </ul>
       </section>
     </div>
@@ -313,29 +292,4 @@
 <script type="module" src="./page.js"></script>
 <script type="module" src="./notification.js"></script>
 <script type="module" src="./fileHandle.js"></script>
-<script>
-//   document.addEventListener("DOMContentLoaded", () => {
-//   // const pearImage = document.querySelector("img[src='./assets/A3.png']");
-//   const pearImage = document.getElementById('home--img');
-  
-//   pearImage.style.transition = "transform 0.1s ease-out";
-
-//   document.addEventListener("mousemove", (event) => {
-//     const rect = pearImage.getBoundingClientRect();
-//     const centerX = rect.left + rect.width / 2;
-//     const centerY = rect.top + rect.height / 2;
-
-//     const offsetX = (event.clientX - centerX) / 10;
-//     const offsetY = (event.clientY - centerY) / 10;
-
-//     pearImage.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
-//   });
-
-//   document.addEventListener("mouseleave", () => {
-//     pearImage.style.transform = "translate(0, 0)";
-//   });
-
-// });
-
-</script>
 </html>

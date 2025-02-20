@@ -1,28 +1,30 @@
-document.addEventListener("DOMContentLoaded", () => {
+const togglePage = (index) => {
   const menuItems = document.querySelectorAll(".sideMenu li");
   const pages = document.querySelectorAll(".page");
 
-  const togglePage = (index) => {
-    menuItems.forEach((item, i) => {
-      item.classList.remove("active");
-      const dot = item.querySelector(".dot");
-      if (dot) dot.classList.add("dot-hide");
+  menuItems.forEach((item, i) => {
+    item.classList.remove("active");
+    const dot = item.querySelector(".dot");
+    if (dot) dot.classList.add("dot-hide");
 
-      if (pages[i]) {
-        pages[i].classList.add("hide");
-      }
-    });
-
-    if (index !== undefined) {
-      menuItems[index].classList.add("active");
-      const activeDot = menuItems[index].querySelector(".dot");
-      if (activeDot) activeDot.classList.remove("dot-hide");
-
-      if (pages[index]) {
-        pages[index].classList.remove("hide");
-      }
+    if (pages[i]) {
+      pages[i].classList.add("hide");
     }
-  };
+  });
+
+  if (index !== undefined) {
+    menuItems[index].classList.add("active");
+    const activeDot = menuItems[index].querySelector(".dot");
+    if (activeDot) activeDot.classList.remove("dot-hide");
+
+    if (pages[index]) {
+      pages[index].classList.remove("hide");
+    }
+  }
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+  const menuItems = document.querySelectorAll(".sideMenu li");
 
   menuItems.forEach((item, index) => {
     item.addEventListener("click", () => {
@@ -32,16 +34,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Show the home page initially
   document.querySelector("#home--page").classList.remove("hide");
-  togglePage(7); // Default to Dashboard
+  togglePage(0); // Default to Dashboard
 
   // ** Dashboard Click Events **
   const dashboardLinks = {
-    ".dash-myApps": 0, // My Apps
-    ".dash-local": 1, // System Pear Apps
-    ".dash-apps": 2, // Apps Directory
-    ".dash-myGames": 4, // Only Games
-    ".dash-liveCrypto": 5, // Live Crypto
-    ".dash-addApp": 6, // Add App
+    ".dash-myApps": 1, // My Apps
+    ".dash-local": 2, // System Pear Apps
+    ".dash-apps": 3, // Apps Directory
+    ".dash-rooms": 4 // Rooms Directory
   };
 
   Object.entries(dashboardLinks).forEach(([selector, index]) => {
@@ -54,3 +54,36 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+
+// ** Form Close Button Event **
+const formCloseButton = document.querySelector('.form-close-button');
+if (formCloseButton) {
+  formCloseButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    togglePage(0);
+  });
+}
+
+// Gradient color change.
+
+const elements = [
+  { selector: ".dash-myApps", colors: ["#ff7eb390", "#fff"] },
+  { selector: ".dash-local", colors: ["#ff9a8b90", "#fff"] },
+  { selector: ".dash-apps", colors: ["#a18cd190", "#fff"] },
+  { selector: ".dash-rooms", colors: ["#fad0c4", "#fff"] }
+];
+
+let angle = 0;
+
+function updateGradients() {
+  angle = (angle + 1) % 360;
+  elements.forEach(({ selector, colors }) => {
+    const element = document.querySelector(selector);
+    if (element) {
+      element.style.background = `linear-gradient(${angle}deg, ${colors[0]}, ${colors[1]})`;
+    }
+  });
+}
+
+setInterval(updateGradients, 100);
+

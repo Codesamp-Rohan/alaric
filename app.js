@@ -97,10 +97,12 @@ const listProducts = async () => {
   const globalRoomSection = document.querySelector('#room--page .list--area');
   
   const globalAppsNo = document.querySelector('#global-apps-no');
+  const globalRoomsNo = document.querySelector('#global-rooms-no');
   const appCount = Array.from(globalApps.values()).filter(app => app.appType !== 'room').length;
   console.log(appCount);
   globalAppsNo.innerHTML = appCount;
   document.querySelector('#dash-apps-no').innerHTML = globalAppsNo.innerHTML;
+  document.querySelector('#dash-rooms-no').innerHTML = globalRoomsNo.innerHTML;
   if(appCount === 0){
     document.getElementById('global-msg').classList.remove('hide');
   } else {
@@ -108,7 +110,7 @@ const listProducts = async () => {
   }
 
   const roomCount = Array.from(globalApps.values()).filter(app => app.appType === 'room').length;
-  document.querySelector('#rooms-apps-no').innerHTML = roomCount;
+  document.querySelector('#global-rooms-no').innerHTML = roomCount;
   if(roomCount === 0){
     document.getElementById('room-msg').classList.remove('hide');
   } else {
@@ -445,7 +447,7 @@ const addApp = async () => {
           reader.readAsDataURL(appLogo);
         });
       } else {
-        return await getDefaultLogoBase64('./assets/alaric.png');
+        return await getDefaultLogoBase64('./assets/keet.png');
       }
     }
   };

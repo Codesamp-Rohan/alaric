@@ -116,7 +116,7 @@ body > h1:nth-of-ty(1) {
     color: #000;
     position: relative;
   }
-  #local-apps-no, #global-apps-no, #pinned-apps-no, #personal-apps-no, #onlyGames-apps-no, #rooms-apps-no, #admin-apps-no{
+  #local-apps-no, #global-apps-no, #pinned-apps-no, #personal-apps-no, #onlyGames-apps-no, #rooms-apps-no, #admin-apps-no, #global-rooms-no{
     position: absolute;
     right: 14px;
     color: #666;
@@ -862,137 +862,26 @@ td p{
     width: 100%;
     height: 78vh;
   }
-  .dash-myApps{
-    background-color: #ffffff2b;
-  }
-  .dash-myApps::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url('./assets/alaric.png');
-    background-position: center;
-    background-size: cover;
-    filter: blur(7px);
-    z-index: -1;
-}
-  .dash-local{
-    background-color: #ffffff2b;
-
-  }
-  .dash-local::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url('./assets/pearM.jpeg');
-    background-position: center;
-    background-size: cover;
-    filter: blur(7px);
-    z-index: -1;
-}
-  .dash-apps{
-    /* background-color: #ffffff2b; */
-  }
-  .dash-apps::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url('./assets/bg');
-    background-position: center;
-    background-size: cover;
-    filter: blur(7px);
-    z-index: -1;
-}
-  .dash-myGames{
-    /* background-color: #ffffff2b; */
-    width: 30%;
-  }
-  .dash-myGames::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url('./assets/game.jpeg');
-    background-position: center;
-    background-size: cover;
-    filter: blur(7px);
-    z-index: -1;
-}
-
-  .dash-liveCrypto{
-    /* background-color: #ffffff2b; */
-  }
-  .dash-liveCrypto::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url('./assets/graph.jpeg');
-    background-position: center;
-    background-size: cover;
-    filter: blur(7px);
-    z-index: -1;
-}
-  .dash-addApp{
-    border-radius: 14px;
-    border: 2px solid #000;
-    position: relative;
-    overflow: hidden;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background-color: #000000;
-    box-shadow: inset 0 0 20px #777;
-  }
 
   .dashboard h1{
-    font-size: 14px;
+    font-size: 18px;
     font-weight: 900;
     color: #fff;
     padding-left: 6px;
   }
   .dashboard p{
     color: #ddd;
-    font-size: 10px;
-    font-weight: 900;
+    font-size: 14px;
     padding-left: 6px;
-  }
-
-  .dash-myGames::after,  .dash-myApps::after,  .dash-local::after,  .dash-liveCrypto::after, .dash-apps::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 50%;
-    background: linear-gradient(to top, #00000045, transparent);
-    z-index: -1;
   }
 
   .dash-myApps,
 .dash-local,
 .dash-apps,
-.dash-myGames,
-.dash-liveCrypto {
+.dash-rooms {
     cursor: pointer;
     transition: 0.2s ease-in-out;
-    background: linear-gradient(45deg, #000000bf, transparent);
     border-radius: 14px;
-    border: 2px solid #eee;
     position: relative;
     overflow: hidden;
     padding: 10px;
@@ -1002,31 +891,24 @@ td p{
     justify-content: flex-end;
 }
 
+.dash-myApps h1, .dash-myApps p,
+.dash-apps h1, .dash-apps p,
+.dash-local h1, .dash-local p,
+.dash-rooms h1, .dash-rooms p{
+  color: #333;
+} 
+
 .dash-myApps:hover,
 .dash-local:hover,
 .dash-apps:hover,
-.dash-myGames:hover,
-.dash-liveCrypto:hover{
+.dash-rooms:hover{
   background: linear-gradient(45deg, #0000006d, transparent);
 }
 
-#dash-myApps-no, #dash-local-no, #dash-apps-no{
+#dash-myApps-no, #dash-local-no, #dash-apps-no, #dash-rooms-no{
   font-size: 16px;
-    font-weight: 100;
+    font-weight: 900;
     color: #bbb;
-}
-.dash-addApp{
-  cursor: pointer;
-  background: #000;
-  border-radius: 14px;
-  border: 2px solid #eee;
-  position: relative;
-  overflow: hidden;
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-end; 
 }
 .dashboard .button{
   display: flex;
@@ -1049,6 +931,29 @@ td p{
   position: absolute;
   top: 10px;
   left: 10px;
-  background-color: #1111119d;
+  background-color: #353535;
   align-items: center;
+}
+
+#banner{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  padding: 6px;
+  color: #fff;
+  font-weight: 900;
+  transform: translate(-50%, -50%) rotate(-25deg);
+  width: 100%;
+  text-align: center;
+  background: #4c4cff;
+  border-radius: 8px;
+  box-shadow: inset 0 0 20px;
+}
+
+#bitmoji{
+  position: absolute;
+  top: 50%;
+  right: -150%;
+  transform: translate(-50%, -50%) rotate(-45deg);
+  transition: 300ms;
 }
