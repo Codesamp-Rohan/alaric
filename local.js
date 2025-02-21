@@ -157,7 +157,7 @@ async function loadPermits() {
               </div>
               <div class="list--side--menu">
                <button class="slide-menu" style="background: transparent; border: 0; width: 30px; height: 30px;"><img style="width: 12px;" src="./assets/arrow.png" class="list--icon icon" /></button>
-               <button class="run-cmd" data-tooltip="Run the Pear app" style="${pearAppType === 'desktop' ? `` : `opacity: 0; pointer-events: none;`}background: transparent; border: 0; width: 30px; height: 30px;">
+               <button class="run-local-cmd" data-tooltip="Run the Pear app" style="${pearAppType === 'desktop' ? `` : `opacity: 0; pointer-events: none;`}background: transparent; border: 0; width: 30px; height: 30px;">
                   <img src="./assets/run.png" style="width: 15px;" class="list--icon icon" />
                   </button>
                 <button class="copy-pearID" data-tooltip="Copy Pear ID" style="background: transparent; border: 0; width: 30px; height: 30px;">
@@ -217,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     }
-    if (event.target.closest('.run-cmd')) {
+    if (event.target.closest('.run-local-cmd')) {
       const parentItem = event.target.closest('.local-list-item');
       if (parentItem) {
         const pearId = parentItem.getAttribute('data-id');

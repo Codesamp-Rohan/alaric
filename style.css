@@ -104,7 +104,7 @@ body > h1:nth-of-ty(1) {
     flex-direction: column;
     gap: 10px;
   }
-  li, .social--links a, #aboutMe--page a{
+  li, .social--links a, #aboutMe--page a, #add--app--form{
     list-style-type: none;
     padding: 3px;
     border-radius: 7px;
@@ -115,6 +115,8 @@ body > h1:nth-of-ty(1) {
     gap: 7px;
     color: #000;
     position: relative;
+    border: 0;
+    background-color: transparent;
   }
   #local-apps-no, #global-apps-no, #pinned-apps-no, #personal-apps-no, #onlyGames-apps-no, #rooms-apps-no, #admin-apps-no, #global-rooms-no{
     position: absolute;
@@ -165,14 +167,6 @@ body > h1:nth-of-ty(1) {
     /* margin-left: 10px; */
     filter: invert(100%);
   }
-  #add--page{
-    position: fixed;
-    z-index: 900;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: #000000d4;
-  }
   .page{
     width: 100%;
     height: 100%;
@@ -198,16 +192,11 @@ body > h1:nth-of-ty(1) {
   }
   form{
     padding: 1rem;
-    position: absolute;
-    top: 50%;
-    width: 70%;
+    width: 100%;
     display: flex;
     flex-direction: column;
-    left: 50%;
-    transform: translate(-50%, -50%);
     background: #fff;
     border-radius: 14px;
-    box-shadow: 0 0 10px #555;
   }
   label, .char-count {
     font-size: 10px;
@@ -709,9 +698,6 @@ td p{
     opacity: 1 !important;
     scale: 1 !important;
   }
-  .personal-app-item:hover img{
-    filter: blur(0) !important;
-  }
   #room--page .list--area .app-item{
     opacity: 1 !important;
     scale: 1 !important;
@@ -889,13 +875,14 @@ td p{
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-end;
+  background: linear-gradient(45deg, #000000bb, transparent);
 }
 
 .dash-myApps h1, .dash-myApps p,
 .dash-apps h1, .dash-apps p,
 .dash-local h1, .dash-local p,
 .dash-rooms h1, .dash-rooms p{
-  color: #333;
+  color: #ddd;
 } 
 
 .dash-myApps:hover,
@@ -922,16 +909,16 @@ td p{
   filter: invert(1);
 }
 .top--data{
-  box-shadow: inset 0 0 10px #777;
+  /* box-shadow: inset 0 0 10px #777; */
   display: flex;
   flex-direction: row;
-  border: 1px solid #444;
+  /* border: 1px solid #444; */
   border-radius: 7px;
   padding: 3px;
   position: absolute;
   top: 10px;
   left: 10px;
-  background-color: #353535;
+  /* background-color: #353535; */
   align-items: center;
 }
 
@@ -956,4 +943,9 @@ td p{
   right: -150%;
   transform: translate(-50%, -50%) rotate(-45deg);
   transition: 300ms;
+}
+
+div:where(.swal2-container).swal2-backdrop-show, div:where(.swal2-container).swal2-noanimation {
+  height: 100vh;
+  background: rgb(0 0 0 / 86%) !important;
 }

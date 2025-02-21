@@ -6,6 +6,7 @@ import crypto from 'hypercore-crypto';
 import b4a from 'b4a';
 import { createRequire } from 'module';
 import { notification } from './notification';
+import Swal from 'sweetalert2';
 const require = createRequire(import.meta.url);
 const { exec } = require('child_process');
 
@@ -16,15 +17,15 @@ let sortOrder = 'newest';
 let feed = new Hypercore(Pear.config.storage + './mazeData1', {
   valueEncoding: 'json',
 });
-let personalAppFeed = new Hypercore(Pear.config.storage + './personalApp', {
+let personalAppFeed = new Hypercore(Pear.config.storage + './personalApp1', {
   valueEncoding: 'json'
 });
 // let feed = new Hypercore(Pear.config.storage + './hyperMazeData', {
-  //   valueEncoding: 'json',
-  // });
-  // let personalAppFeed = new Hypercore(Pear.config.storage + './hyperMazeData/personalApp1', {
-    //   valueEncoding: 'json'
-    // });
+//     valueEncoding: 'json',
+//   });
+//   let personalAppFeed = new Hypercore(Pear.config.storage + './hyperMazeData/personalApp1', {
+//       valueEncoding: 'json'
+//     });
     export const globalApps = new Map();
     const personalApps = new Map();
     
@@ -376,13 +377,6 @@ const joinSwarm = () => {
       } 
     });
 
-    // connection.on('error', (err) => {
-      // console.error('Connection error:', err);
-    // });
-
-    // connection.on('close', () => {
-      // console.log('Connection closed');
-    // });
   });
 
   listProducts();
@@ -394,27 +388,19 @@ const joinSwarm = () => {
 
 process.on('exit', cleanup);
 
-const appDescription = document.getElementById('app-description');
-const charCount = document.getElementById("charCount");
 
-appDescription.addEventListener("input", () => {
-    let text = appDescription.value;
-    if (text.length > 70) {
-        appDescription.value = text.slice(0, 70);
-    }
-    charCount.textContent = `${appDescription.value.length}/70`;
-});
-
-
-const addApp = async () => {
-  const appName = document.getElementById('app-name').value.trim();
-  const appCmd = document.getElementById('app-cmd').value.trim();
-  const appLogo = document.getElementById('app-image').files[0];
-  const appType = document.getElementById('app-type').value;
-  const appLink = document.getElementById('app-link').value.trim();
-
-  if (!appName || !appCmd) {
+const addApp = async (appName, appType, command, appDescription, imageUrl) => {
+  if (!appName || !command) {
     notification('Please fill in the required fields.', 'error');
+    return;
+  }
+
+  if (appType === 'room' && !command.includes('pear://keet/')) {
+    notification('Wrong command input for Room', 'error');
+    return;
+  }
+  if (appType === 'pear' && !command.includes('pear://')) {
+    notification('Wrong command input for Pear', 'error');
     return;
   }
 
@@ -428,31 +414,12 @@ const addApp = async () => {
     });
   };
 
-  const processLogo = async () => {
-    if(appType !== 'room'){
-      if (appLogo) {
-        return new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result);
-          reader.readAsDataURL(appLogo);
-        });
-      } else {
-        return await getDefaultLogoBase64('./assets/alaric.png');
-      }
-    } else {
-      if (appLogo) {
-        return new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result);
-          reader.readAsDataURL(appLogo);
-        });
-      } else {
-        return await getDefaultLogoBase64('./assets/keet.png');
-      }
-    }
-  };
-
-  const logoBase64 = await processLogo();
+  let logoBase64 = imageUrl;
+  if (!logoBase64) {
+    logoBase64 = await getDefaultLogoBase64(
+      appType === 'room' ? './assets/keet.png' : './assets/alaric.png'
+    );
+  }
 
   const appData = {
     type: 'app-data',
@@ -460,24 +427,136 @@ const addApp = async () => {
     name: appName,
     createAt: Date.now(),
     appType: appType,
-    appDescription: appDescription.value, // Use .value here to get the text
+    appDescription: appDescription,
     logo: logoBase64,
-    link: appLink || 'https://github.com/Codesamp-Rohan',
-    cmd: appCmd,
-  };  
-
-  console.log(appLogo, appData);
+    cmd: command,
+  };
 
   await addProduct(appData);
   addPersonalApp(appData);
-
-  document.getElementById('app-name').value = '';
-  document.getElementById('app-image').value = '';
-  document.getElementById('app-description').value = '';
-  document.getElementById('app-cmd').value = '';
-  document.getElementById('app-link').value = '';
-  charCount.textContent = "0/70";
 };
+
+document.getElementById('add--app--form').addEventListener('click', async (e) => {
+  e.preventDefault();
+
+  const { value: appType } = await Swal.fire({
+    title: 'Choose Type',
+    input: 'select',
+    inputOptions: {
+      pear: 'Pear',
+      holesail: 'Holesail',
+      room: 'Room',
+    },
+    inputPlaceholder: 'Choose an option',
+    showCancelButton: true,
+  });
+
+  if (!appType) return;
+
+  const { value: appName } = await Swal.fire({
+    title: `Name of the ${appType}`,
+    input: 'text',
+    inputPlaceholder: `${appType} Name`,
+    showCancelButton: true,
+  });
+
+  if (!appName) return;
+
+  let command = '';
+  while (true) {
+    const inputPlaceholder = appType === 'room' 
+    ? 'Enter Room Link (e.g., pear://keet/...)' 
+    : appType === 'pear' 
+      ? 'Enter Pear Command (e.g., pear run pear://<pearKey>)' 
+      : 'Enter Holesail Key (e.g., holesail connection string)';
+  
+  const { value } = await Swal.fire({
+    title: `Enter ${appType} Command`,
+    input: 'text',
+    inputPlaceholder,
+    showCancelButton: true,
+  });
+  
+
+    if (!value) return;
+
+    if (appType === 'room' && !value.includes('pear://keet/')) {
+      await Swal.fire({ title: 'Error', text: 'Wrong command input for Room. Please enter a valid command.', icon: 'error' });
+      continue;
+    }
+    command = value;
+    break;
+  }
+
+  let description = '';
+  await Swal.fire({
+    title: 'Enter Description',
+    input: 'textarea',
+    inputLabel: 'Words limit 0/70',
+    inputPlaceholder: 'Describe your app',
+    showCancelButton: true,
+    didOpen: () => {
+      const textarea = Swal.getPopup().querySelector('textarea');
+      const label = Swal.getPopup().querySelector('.swal2-input-label');
+  
+      textarea.addEventListener('input', () => {
+        if (textarea.value.length > 70) {
+          textarea.value = textarea.value.slice(0, 70);
+        }
+        if (label) {
+          label.textContent = `Words limit ${textarea.value.length}/70`;
+        }
+      });
+    }
+  }).then(({ value }) => {
+    description = value || '';
+  });
+
+  if (!description) return;
+
+  let imageUrl = '';
+  while (true) {
+    const { value: file } = await Swal.fire({
+      title: 'Upload an Icon (Max 500KB)',
+      input: 'file',
+      inputAttributes: {
+        accept: 'image/*',
+      },
+      showCancelButton: true,
+    });
+  
+    if (!file) break;
+
+    if (file.size > 500 * 1024) { // 500KB limit
+      await Swal.fire({
+        title: 'Error',
+        text: 'File size exceeds 500KB. Please upload a smaller file.',
+        icon: 'error',
+      });
+      continue;
+    }
+  
+    const reader = new FileReader();
+    imageUrl = await new Promise((resolve) => {
+      reader.onload = () => resolve(reader.result);
+      reader.readAsDataURL(file);
+    });
+    break;
+  }
+
+  await addApp(appName, appType, command, description, imageUrl);
+
+  await Swal.fire({
+    title: 'App Created!',
+    html: `<strong>Type:</strong> ${appType} <br>
+           <strong>Name:</strong> ${appName} <br>
+           <strong>Command:</strong> ${command} <br>
+           <strong>Description:</strong> ${description} <br>
+           ${imageUrl ? `<img src="${imageUrl}" alt="App Icon" style="max-width: 100px; display: block; margin: 10px auto;">` : 'No icon uploaded'}`,
+    icon: 'success',
+  });
+});
+
 
 process.on('SIGINT', async () => {
   console.log('Shutting down...');
@@ -487,7 +566,8 @@ process.on('SIGINT', async () => {
 });
 
 joinSwarm();
-document.getElementById('submit-btn').addEventListener('click', addApp);
+
+
 const reloadApp = () => {
   console.log('Reloading...');
   feed.close();
@@ -610,11 +690,11 @@ const listPersonalApps = async () => {
         <div style="position: relative; cursor: pointer; width: 20%;height: 180px;border-radius: 20px; background-color: #000; box-shadow: 0 0 10px #bbb; overflow: hidden; box-shadow: 6px 7px 10px #a5a5a5;" class="personal-app-item reveal" data-cmd="${app.cmd}" data-id="${app.id}" id="${app.appId}">
           <div class="personal-list" style="display: flex;flex-direction: column;align-items: center;gap: 10px;position: relative;background-color: #000000;width: 100%;height: 100%;box-shadow: inset 0 0 30px #ddd;">
             <img 
-              style="transition: 300ms;padding: 7px;border-radius: 13px;border: 0;width: 160%;height: 130%;position: absolute;top: 50%;right: 0;filter: blur(7px);transform: translateY(-61%);" 
+              style="transition: 300ms;border-radius: 13px;border: 0;width: 85%;position: absolute;top: 48%;transform: translateY(-61%);" 
               src="${app.logo || './assets/alaric.png'}" 
               alt="App Logo"/>
             <div style="width: 100%;display: flex;flex-direction: column;position: absolute;
-    bottom: 0;height: 100%;background: linear-gradient(0deg, rgb(0 0 0) 0%, rgb(0 0 0) 19%, rgb(0 0 0 / 0%) 75%, rgba(255, 255, 255, 0) 100%);padding: 1.5rem 1rem;justify-content: flex-end;">
+    bottom: 0;height: 100%;background: linear-gradient(0deg, rgb(0 0 0) 0%, rgb(0 0 0) 19%, rgb(0 0 0 / 0%) 95%, rgba(255, 255, 255, 0) 100%);padding: 1.5rem 1rem;justify-content: flex-end;">
             <p style="color: #fff; font-size: 12px; font-weight: 900;"><strong>${app.name}</strong></p>
             <div style="display: flex; gap: 3px; align-items: center;">
                 <p style="font-size: 8px; font-weight: 900; color:#61ff88; white-space: nowrap;">${app.appType}</p>

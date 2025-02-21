@@ -66,24 +66,24 @@ if (formCloseButton) {
 
 // Gradient color change.
 
-const elements = [
-  { selector: ".dash-myApps", colors: ["#ff7eb390", "#fff"] },
-  { selector: ".dash-local", colors: ["#ff9a8b90", "#fff"] },
-  { selector: ".dash-apps", colors: ["#a18cd190", "#fff"] },
-  { selector: ".dash-rooms", colors: ["#fad0c4", "#fff"] }
-];
+// const elements = [
+//   { selector: ".dash-myApps", colors: ["#ff7eb390", "#fff"] },
+//   { selector: ".dash-local", colors: ["#ff9a8b90", "#fff"] },
+//   { selector: ".dash-apps", colors: ["#a18cd190", "#fff"] },
+//   { selector: ".dash-rooms", colors: ["#A29DFF", "#fff"] }
+// ];
 
-let angle = 0;
+// let angle = 0;
 
-function updateGradients() {
-  angle = (angle + 1) % 360;
-  elements.forEach(({ selector, colors }) => {
-    const element = document.querySelector(selector);
-    if (element) {
-      element.style.background = `linear-gradient(${angle}deg, ${colors[0]}, ${colors[1]})`;
-    }
-  });
-}
+// function updateGradients() {
+//   angle = (angle + 1) % 360;
+//   elements.forEach(({ selector, colors }) => {
+//     const element = document.querySelector(selector);
+//     if (element) {
+//       element.style.background = `linear-gradient(${angle}deg, ${colors[0]}, ${colors[1]})`;
+//     }
+//   });
+// }
 
-setInterval(updateGradients, 100);
+// setInterval(updateGradients, 100);
 
