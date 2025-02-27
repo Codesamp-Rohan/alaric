@@ -35,6 +35,9 @@ body > h1:nth-of-ty(1) {
     backdrop-filter: blur(40px);
     overflow: hidden;
 }
+.font{
+  font-family: 'monaFont';
+}
 .blob1{
   width: 200px;
   height: 200px;
@@ -55,7 +58,7 @@ body > h1:nth-of-ty(1) {
   right: 0;
   transform: translateX(-50%);
 }
-  h1{
+  h1, .custom-title{
     font-size: 22px;
     font-weight: 900;
   }
@@ -94,6 +97,7 @@ body > h1:nth-of-ty(1) {
     padding: 1rem;
     /* background: linear-gradient(to right, #000 0%, #00000059 50%, #00000024 70%, #00000000 100%); */
     border-right: 1px solid #ddd;
+    overflow-y: scroll;
   }
   .data--area{
     width: 75%;
@@ -104,7 +108,7 @@ body > h1:nth-of-ty(1) {
     flex-direction: column;
     gap: 10px;
   }
-  li, .social--links a, #aboutMe--page a, #add--app--form{
+  li, #add--app--form, #payment--form{
     list-style-type: none;
     padding: 3px;
     border-radius: 7px;
@@ -118,7 +122,21 @@ body > h1:nth-of-ty(1) {
     border: 0;
     background-color: transparent;
   }
-  #local-apps-no, #global-apps-no, #pinned-apps-no, #personal-apps-no, #onlyGames-apps-no, #rooms-apps-no, #admin-apps-no, #global-rooms-no{
+  .social--links a, #aboutMe--page a{
+    list-style-type: none;
+    padding: 5px;
+    border-radius: 7px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 7px;
+    color: #000;
+    position: relative;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+  }
+  #local-apps-no, #global-apps-no, #pinned-apps-no, #personal-apps-no, #onlyGames-apps-no, #rooms-apps-no, #admin-apps-no, #global-rooms-no, #premium-apps-no{
     position: absolute;
     right: 14px;
     color: #666;
@@ -152,7 +170,7 @@ body > h1:nth-of-ty(1) {
   }
   .sideMenu .icon{
     padding: 4px;
-    width: 25px;
+    width: 23px;
   }
   .active{
     /* background-color: #48484824; */
@@ -175,6 +193,9 @@ body > h1:nth-of-ty(1) {
     position: relative;
   }
   .page::-webkit-scrollbar {
+    display: none;
+  }
+  *::-webkit-scrollbar {
     display: none;
   }
   .hide{
@@ -201,9 +222,9 @@ body > h1:nth-of-ty(1) {
   label, .char-count {
     font-size: 10px;
     font-weight: 900;
-    color: #bbb;
+    color: #ff0000;
   }
-  input, select, textarea{
+  input, .input, select, textarea, .textarea{
     padding: 10px 6px;
     margin-top: 6px;
     border-radius: 6px;
@@ -213,14 +234,16 @@ body > h1:nth-of-ty(1) {
     color: #777;
     border: 1px solid #ddd;
     font-family: monaFont;
+    outline: 0;
   }
-  input:focus, select:focus, textarea:focus{
+  input:focus, .input:focus, select:focus, textarea:focus, .textarea:focus{
     outline: 0;
   }
   option{
     background-color: #ddd;
   }
-  #submit-btn, .button{
+  #submit-btn, .button, .custom-confirm-button, .custom-cancel-button
+  {
     padding: 8px;
     font-size: 11px;
     font-weight: 900;
@@ -229,11 +252,15 @@ body > h1:nth-of-ty(1) {
     background-color: #000000;
     color: #fff;
     border: 0;
-    box-shadow: inset 0 0 10px #bbb;
+  }
+  .custom-confirm-button, .custom-cancel-button{
+    width: 20vw;
+    padding: 10px;
   }
   .button{
     width: 100%;
     font-size: 12px;
+    box-shadow: 0 !important;
   }
   button{
     cursor: pointer;
@@ -255,7 +282,7 @@ body > h1:nth-of-ty(1) {
     justify-content: flex-start;
     overflow-x: hidden;
   }
-  .app-item{
+  .app-item, .room-item{
     width: 100%;
     transition: 300ms;
     overflow: hidden;
@@ -279,6 +306,7 @@ body > h1:nth-of-ty(1) {
     transition: 200ms;
     opacity: 0;
     scale: 0.6;
+    overflow: hidden;
   }
   .reveal{
     opacity: 1;
@@ -516,7 +544,7 @@ svg {
 .notification{
   padding: 10px;
   border-radius: 10px;
-  z-index: 999;
+  z-index: 1000;
   position: fixed;
   bottom: 10px;
   right: -140%;
@@ -535,22 +563,34 @@ svg {
 #add-holesail-details{
   position: fixed;
   top: 50%;
-  left: 65%;
+  left: 50%;
   transform: translate(-50%, -50%);
   width: 46%;
   z-index: 999;
 }
-.overlay{
+.overlay {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: #2d2d2d8a;
   width: 100%;
   height: 100%;
-  z-index: 100;
-  backdrop-filter: blur(8px);
+  z-index: 999;
 }
+
+.overlay::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #2d2d2d8a;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: -1;
+}
+
 .highlight {
   background-color: #625ac4;
   color: white;
@@ -608,7 +648,7 @@ svg {
   .version{
     position: fixed;
     bottom: 10px;
-    right: 10px;
+    left: 1rem;
   }
   /* BTC */
   #price { font-size: 2em; font-weight: bold; margin: 10px 0; }
@@ -698,10 +738,6 @@ td p{
     opacity: 1 !important;
     scale: 1 !important;
   }
-  #room--page .list--area .app-item{
-    opacity: 1 !important;
-    scale: 1 !important;
-  }
   #global-msg, #room-msg{
     margin: 2rem 1rem 1rem 1rem;
   }
@@ -713,7 +749,7 @@ td p{
     transform: translate(-50%, -50%);
     padding: 1rem;
     border-radius: 10px;
-    z-index: 990;
+    z-index: 999;
     background-color: #fff;
   }
 
@@ -764,6 +800,7 @@ td p{
     border-radius: 15px;
   }
   .trending-app-card {
+    cursor: pointer;
     flex: 0 0 auto;
     width: 350px;
     height: 200px;
@@ -777,6 +814,7 @@ td p{
     color: white;
     text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    transition: 100ms;
   }
   
   /* Blurred background layer */
@@ -861,10 +899,11 @@ td p{
     padding-left: 6px;
   }
 
-  .dash-myApps,
+.dash-myApps,
 .dash-local,
 .dash-apps,
-.dash-rooms {
+.dash-rooms, .dash-premiumApps {
+  position: relative;
     cursor: pointer;
     transition: 0.2s ease-in-out;
     border-radius: 14px;
@@ -881,18 +920,19 @@ td p{
 .dash-myApps h1, .dash-myApps p,
 .dash-apps h1, .dash-apps p,
 .dash-local h1, .dash-local p,
-.dash-rooms h1, .dash-rooms p{
+.dash-rooms h1, .dash-rooms p,
+.dash-premiumApps h1, .dash-premiumApps p{
   color: #ddd;
 } 
 
 .dash-myApps:hover,
 .dash-local:hover,
 .dash-apps:hover,
-.dash-rooms:hover{
+.dash-rooms:hover, .dash-premiumApps:hover{
   background: linear-gradient(45deg, #0000006d, transparent);
 }
 
-#dash-myApps-no, #dash-local-no, #dash-apps-no, #dash-rooms-no{
+#dash-myApps-no, #dash-local-no, #dash-apps-no, #dash-rooms-no, .dash-premium-no{
   font-size: 16px;
     font-weight: 900;
     color: #bbb;
@@ -922,6 +962,11 @@ td p{
   align-items: center;
 }
 
+.slide--out {
+  transform: translateX(150%) !important; /* Slide-out Distance */
+  transition: transform 600ms ease-in-out !important;
+}
+
 #banner{
   position: absolute;
   top: 50%;
@@ -948,4 +993,125 @@ td p{
 div:where(.swal2-container).swal2-backdrop-show, div:where(.swal2-container).swal2-noanimation {
   height: 100vh;
   background: rgb(0 0 0 / 86%) !important;
+}
+div:where(.swal2-container) input:where(.swal2-input):focus, div:where(.swal2-container) input:where(.swal2-file):focus, div:where(.swal2-container) textarea:where(.swal2-textarea):focus{
+  border: 0 !important;
+  margin-top: 20px;
+}
+
+div:where(.swal2-container) div:where(.swal2-actions){
+  margin: 0 !important;
+}
+
+.context-menu {
+  position: absolute;
+  background: white;
+  border: 1px solid #ccc;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  display: none;
+  z-index: 1000;
+}
+
+.context-menu.active {
+  display: block;
+}
+
+.context-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 5px 0;
+}
+
+.context-menu ul li {
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.context-menu ul li:hover {
+  background: #f0f0f0;
+}
+
+.hidden { display: none; }
+#qr-section img { margin-top: 20px; }
+
+#premium--page .list--area{
+  padding: 1rem;
+}
+
+.premium-app{
+  width: 100%;
+  /* background-color: #eee; */
+  border-radius: 14px;
+  /* padding: 10px; */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+}
+.premium-app button{
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+}
+
+#menu{
+  display: none;
+}
+#close--menu{
+  display: none;
+}
+
+@media screen and (max-width: 768px) {
+  .sideMenu{
+    width: 50%;
+    height: 100%;
+    position: fixed;
+    left: -130%;
+    background-color: #fff;
+    z-index: 1000;
+  }
+  .page{
+    margin-top: 1rem;
+  }
+  #close--menu{
+    display: block;
+    position: absolute;
+    top: 26px;
+    left: 86%;
+    z-index: 1000;
+    border: 0;
+    background: transparent;
+    width: 30px;
+    height: 30px;
+    padding: 4px;
+  }
+  #close--menu img{
+    width: 16px;
+    height: 16px;
+  }
+  .sideMenu p{
+    font-size: 14px;
+  }
+  .menu--active{
+    left: 0;
+  }
+  .data--area{
+    width: 100%;
+  }
+  h1{
+    font-size: 14px;
+  }
+  p{
+    font-size: 11px;
+  }
+  #menu{
+    display: block;
+    margin-left: 1rem;
+    background: transparent;
+    border: 0;
+    transform: rotate(180deg);
+    z-index: 999;
+  }
 }

@@ -4,13 +4,17 @@
   <link rel="stylesheet" href="./style.css">
   <script type='module' src='./app.js'></script>
   <script type="module" src="./local.js"></script>
+  <script type="module" src="./generateInvoice.js"></script>
+  <script type="module" src="./premium.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
 </head>
 <body>
   <div id="bar"><pear-ctrl></pear-ctrl></div>
   <div class="blob1"></div>
   <div class="blob2"></div>
-  <p class="version">Build V19</p>
+  <p class="version">Build V25</p>
   <!-- <p id="price"></p> -->
   <main>
     <div class="notification">
@@ -21,31 +25,61 @@
       <p class="notification-message"></p>
     </div>
     <section class="sideMenu">
+      <button id="close--menu">
+        <img src="./assets/close.png"/>
+      </button>
       <div style="display: flex; align-items: center; gap: 4px;"><img src="./assets/alaric.png" style="width: 40px; height: 40px;" /><h1 id="app-heading">Alaric.app</h1></div>
       <div style="display: flex; flex-direction: column; justify-content: space-between; width: 100%; height: 93%;">
-      <ul style="margin-top: 2rem;">
-        <li id="dashboard--menu"><span class="dot dot-hide"></span><img src="./assets/dashboard.png" class="icon" /><p>Dashboard</p></li>
-        <li><span class="dot dot-hide"></span><img src="./assets/my.png" class="icon" /><p>My Apps</p>
-          <p id="personal-apps-no">0</p></li>
+      <ul style="margin-top: 2rem; padding-bottom: 1rem;">
+        <p style="padding-left: 1rem;
+        font-size: 10px;
+        color: #777;">dashboard</p>
+        <li data-name="dashboard" id="dashboard--menu"><span class="dot dot-hide"></span><img src="./assets/dashboard.png" class="icon" /><p>Dashboard</p></li>
+
+        <p style="padding-left: 1rem;
+        font-size: 10px;
+        color: #777;">apps</p>
+        <li><span class="dot dot-hide"></span>
+          <img src="./assets/my.png" class="icon" /><p>My Apps</p>
+          <p id="personal-apps-no">0</p>
+        </li>
         <li><span class="dot dot-hide"></span><img src="./assets/install.png" class="icon" /><p>System Pear Apps</p>
-          <p id="local-apps-no">0</p></li>
-        <li><span class="dot dot-hide"></span><img src="./assets/directory.png" class="icon" /><p>Apps Directory</p>
-          <p id="global-apps-no">0</p></li>
-          <li><span class="dot dot-hide"></span><img src="./assets/room.png" class="icon" /><p>Rooms</p>
-            <p id="global-rooms-no">0</p></li>
-          <li><span class="dot dot-hide"></span><img src="./assets/game.png" class="icon" /><p>OnlyGames</p>
-            <p id="onlyGames-apps-no">0</p></li>
-            <li><span class="dot dot-hide"></span><img src="./assets/crypto.png" class="icon" /><p>Live Crypto</p></li>
-        <!-- <li><span class="dot dot-hide"></span><img src="./assets/add.png" class="icon" /><p>Add App</p></li> -->
+          <p id="local-apps-no">0</p>
+        </li>
+        <li><span class="dot dot-hide"></span><img src="./assets/directory.png" class="icon" />
+          <p>Apps Directory</p>
+          <p id="global-apps-no">0</p>
+        </li>
+        <li><span class="dot dot-hide"></span><img src="./assets/room.png" class="icon" />
+          <p>Rooms</p>
+          <p id="global-rooms-no">0</p>
+        </li>
+        <li><span class="dot dot-hide"></span><img src="./assets/premium.png" class="icon" />
+          <p>Premium Apps</p>
+          <p id="premium-apps-no">0</p>
+        </li>
+        <li><span class="dot dot-hide"></span><img src="./assets/game.png" class="icon" />
+          <p>OnlyGames</p>
+          <p id="onlyGames-apps-no">0</p>
+        </li>
+
+        <p style="padding-left: 1rem;
+        font-size: 10px;
+        color: #777;">others</p>
+        <li><span class="dot dot-hide"></span><img src="./assets/crypto.png" class="icon"/>
+          <p>Live Crypto</p>
+        </li>
+        <button type="button" id="payment--form"><span class="dot dot-hide"></span><img src="./assets/donate.png" class="icon" /><p>Donate</p></button>
         <button type="button" id="add--app--form"><span class="dot dot-hide"></span><img src="./assets/add.png" class="icon" /><p>Add App</p></button>
-      </ul>
-      <ul>
         <li class="active"><span class="dot dot-hide"></span><img src="./assets/imp.png" class="icon" /><p>Alert Message</p></li>
       <li class="active"><span class="dot dot-hide"></span><img src="./assets/about.png" class="icon" /><p>About the Creator</p></li>
       </ul>
       </div>  
     </section>
     <div class="data--area">
+      <button id="menu">
+        <img src="./assets/menu.png" style="width: 20px; height: 20px;"/>
+      </button>
       <div class="overlay hide"></div>
       <div id="global--popUp" class="hide">
         <div id="popUp--pearContent"></div>
@@ -59,8 +93,11 @@
               <div class="dashboard">
                 <div style=" display: flex;gap: 10px;width: 100%; height: 100%;">
                 <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+
                   <div style="display: flex; gap: 10px;width: 100%; height: 30%;">
                     <div class="dash-myApps" style="width: 100%; background-color: #413b91;">
+                      <img src="./assets/ball.png" style="width: 130px;
+                      height: 130px;position: absolute;top: 64%;right: -8%;transform: translate(0, -50%) rotate(-90deg);transition: 600ms cubic-bezier(0, -1.22, 0, 1.25);" class="slide--out"/>
                       <div class="top--data">
                         <img src="./assets/alaricBG.png" style="width: 30px; height: 30px;" />
                         <h1 id="dash-myApps-no" style="padding-right: 6px;">00</h1>
@@ -70,6 +107,8 @@
                       <!-- <button class="button">apps added by you</button> -->
                     </div>
                     <div class="dash-local" style="width: 100%;background-color: #2C3930;">
+                      <img src="./assets/branch.png" style="width: 100px;
+                      height: 100px;position: absolute;top: 42%;right: -2%;transform: translate(0, -50%) rotate(-90deg); transition: 600ms cubic-bezier(0, -1.22, 0, 1.25)" class="slide--out"/>
                       <div class="top--data">
                         <img src="./assets/pear.svg" style="width: 30px; height: 30px;padding: 3px;" />
                         <h1 id="dash-local-no" style="padding-right: 6px;">00</h1>
@@ -79,8 +118,11 @@
                       <!-- <button class="button">local system pears</button> -->
                     </div>
                   </div>
+
                   <div style="display: flex; gap: 10px;width: 100%; height: 30%;">
                     <div class="dash-apps" style="width: 100%;background-color: #144653;">
+                      <img src="./assets/appDirectory.png" style="width: 130px;
+                      height: 130px;position: absolute;top: 64%;right: -8%;transform: translate(0, -50%) rotate(-90deg);transition: 600ms cubic-bezier(0, -1.22, 0, 1.25);" class="slide--out"/>
                       <div class="top--data">
                         <img src="./assets/earth.png" style="width: 30px; height: 30px;padding: 3px;" />
                         <h1 id="dash-apps-no" style="padding-right: 6px;">00</h1>
@@ -90,6 +132,7 @@
                       <!-- <button class="button">apps added by alaricans</button> -->
                     </div>
                     <div class="dash-rooms" style="width: 100%;background-color: #003161;">
+                      <img src="./assets/birds.png" style="width: 100px;height: 100px;position: absolute;top: 50%;right: 10%;transform: translate(0, -50%) rotate(-45deg); transition: 600ms cubic-bezier(0, -1.22, 0, 1.25)" class="slide--out"/>
                       <div class="top--data">
                         <img src="./assets/keet.png" style="width: 30px; height: 30px;padding: 3px;" />
                         <h1 id="dash-rooms-no" style="padding-right: 6px;">00</h1>
@@ -98,6 +141,19 @@
                       <p>Most popular Keet Rooms</p>
                       <!-- <button class="button">rooms added by alaricans</button> -->
                     </div>
+                  </div>
+
+                  <div style="display: flex; gap: 10px;width: 50%; height: 30%;">
+                  <div class="dash-premiumApps" style="width: 100%; background-color: #FFB200;">
+                    <img src="./assets/coins.png" style="width: 100px;height: 100px;position: absolute;top: 60%;right: 9%;transform: translate(0, -50%);transition: 600ms cubic-bezier(0, -1.22, 0, 1.25)" class="slide--out"/>
+                    <div class="top--data">
+                      <img src="./assets/btc.png" style="width: 30px; height: 30px; padding: 2px;"/>
+                      <h1 id="dash-premium-no" style="padding-right: 6px;">00</h1>
+                    </div>
+                    <h1>Premium Apps</h1>
+                    <p>Apps worth paying</p>
+                    <!-- <button class="button">apps added by you</button> -->
+                  </div>
                   </div>
                 </div>
               </div>
@@ -113,9 +169,13 @@
       </section>
       <!-- Installed / Local Apps -->
       <section class="page hide" id="local--page">
-        <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999; background-color: #fff;border: 1px solid #eee;padding-inline: 10px;border-radius: 12px;">
+        <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 900; background-color: #fff;border: 1px solid #eee;padding-inline: 10px;border-radius: 12px;">
           <p class="page--header">Your Local Pear Apps</p>
-          <button class="clear-cacheBtn">CLEAR CACHE</button>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <input type="text" style="margin-top: 0;border-radius: 5px;padding: 10px; width: 260px;" id="local--search" placeholder="Search the Local Pears" />
+          <!-- <button class="clear-cacheBtn">CLEAR CACHE</button> -->
+          <button class="button reload--app" style="width: fit-content;font-size: 10px;font-weight: 900;margin-top: 0; color: #fff; background-color: #000;border-radius: 5px;">Reload App</button>
+          </div>
           </div>
           <div id="trending--apps-container">
             <div style="margin: 1rem 1rem 0.2rem 1rem;">
@@ -160,7 +220,7 @@
         <div  style="display: flex;flex-direction: row;justify-content: space-between;align-items: center;width: 100%;position: sticky;top: 0;z-index: 99;background-color: #fff;border: 1px solid #eee;padding-inline: 10px;border-radius: 12px;">
           <p class="page--header">Rooms Directory</p>
           <div style="display: flex; align-items: center; gap: 10px;">
-            <input type="text" style="margin-top: 0;border-radius: 5px;padding: 10px; width: 260px;" id="room--search" placeholder="Search the App" />
+            <input type="text" style="margin-top: 0;border-radius: 5px;padding: 10px; width: 260px;" id="room--search" placeholder="Search the Rooms" />
           <div class="dropdown">
             <button class="dropbtn"><img src="./assets/sort.png" style="width: 8px;" />Sort By</button>
             <div class="dropdown-content">
@@ -173,6 +233,14 @@
           </div>
           </div>
           <p id="room-msg" class="hide">No Rooms added yet!!!</p>
+          <div class="list--area">
+          </div>
+      </section>
+      <!-- Premium Apps -->
+      <section class="page" id="premium--page">
+        <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999;">
+          <p class="page--header">Premium Apps</p>
+          </div>
           <div class="list--area">
           </div>
       </section>
@@ -208,40 +276,6 @@
           </table>
           </div>
       </section>
-      <!-- Add App Form -->
-      <!-- <section class="page hide" id="add--page">
-        <div  style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999;">
-          </div>
-          <form>
-            <div style="display: flex; align-items: center; gap: 3px;margin-bottom: 10px;">
-              <p style="font-size: 16px;font-weight: 900;color: #555;;">Add App Form</p>
-            </div>
-            <label style="margin-top: 1rem;">Choose Type*</label>
-            <select id="app-type" name="app-type" required>
-              <option value="pear">Pear</option>
-              <option value="terminal">Terminal</option>
-              <option value="holesail">Holesail</option>
-              <option value="room">Room</option>
-              <option value="other">Other</option>
-            </select>
-            <label style="margin-top: 1rem;">Name of the App*</label>
-            <input required type="text" name="app-name" id="app-name" placeholder="Eg: Keet">
-            <label style="margin-top: 1rem;">Upload Logo</label>
-            <input type="file" accept="image/png, image/jpeg, image/webp" name="app-image" id="app-image" placeholder="Upload an image">
-            <label id="app-cmd-label" style="margin-top: 1rem;">Add run command*<br/>
-              <span style="color: rgb(0, 128, 255); font-size: 8px; font-weight: 900;">Please add the complete command</span>
-            </label>
-            <input required type="text" name="app-cmd" id="app-cmd" placeholder="Eg: holesail <connection-string>">
-              <div style="display: flex; justify-content: space-between; position: relative; align-items: flex-end;">
-              <label style="margin-top: 1rem;">App Description*</label>
-              <p class="char-count" id="charCount">0/70</p>
-              </div>
-              <textarea type="text" name="app-description" id="app-description" placeholder="Write the description of app."></textarea>
-              <div style="display: flex; gap: 4px; align-items: center;">
-                <button type="button" id="submit-btn" class="button">Submit</button>
-              </div>
-          </form>
-      </section> -->
       <!-- Rules Page -->
       <section class="page hide" id="rules--page" style="padding-bottom: 1rem;">
           <div  style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999;">
@@ -282,8 +316,33 @@
     </div>
   </main>
 </body>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const images = document.querySelectorAll("img.slide--out");
+
+    if (images.length) {
+        images.forEach((image, index) => {
+            setTimeout(() => {
+                image.classList.remove("slide--out");
+            }, 2000); 
+        });
+    }
+
+    document.getElementById('menu').addEventListener('click', () => {
+      document.querySelector('.overlay').classList.toggle('active');
+      document.querySelector('.sideMenu').classList.toggle('menu--active');
+    })
+    document.getElementById('close--menu').addEventListener('click', () => {
+      document.querySelector('.overlay').classList.toggle('active');
+      document.querySelector('.sideMenu').classList.toggle('menu--active');
+    })
+});
+
+
+</script>
+
 <script type="module" src="./bitcoin.js"></script>
 <script type="module" src="./page.js"></script>
 <script type="module" src="./notification.js"></script>
-<script type="module" src="./fileHandle.js"></script>
 </html>

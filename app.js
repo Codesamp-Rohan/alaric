@@ -11,21 +11,21 @@ const require = createRequire(import.meta.url);
 const { exec } = require('child_process');
 
 const swarm = new Hyperswarm();
-const COMMON_GLOBAL_KEY = '45a3e8723d7368659d465871386ee74cdcd99d64b041a327f52302fc8ff1acac';
+const COMMON_GLOBAL_KEY = '7ea84e502381b03fdba9039fb2b714e49daa9184740c35c8b07bf13d13bd6ef8';
 
 let sortOrder = 'newest';
-let feed = new Hypercore(Pear.config.storage + './mazeData1', {
-  valueEncoding: 'json',
-});
-let personalAppFeed = new Hypercore(Pear.config.storage + './personalApp1', {
-  valueEncoding: 'json'
-});
-// let feed = new Hypercore(Pear.config.storage + './hyperMazeData', {
-//     valueEncoding: 'json',
-//   });
-//   let personalAppFeed = new Hypercore(Pear.config.storage + './hyperMazeData/personalApp1', {
-//       valueEncoding: 'json'
-//     });
+// let feed = new Hypercore(Pear.config.storage + './mazeData1', {
+//   valueEncoding: 'json',
+// });
+// let personalAppFeed = new Hypercore(Pear.config.storage + './personalApp1', {
+//   valueEncoding: 'json'
+// });
+let feed = new Hypercore(Pear.config.storage + './alaricAppData', {
+    valueEncoding: 'json',
+  });
+  let personalAppFeed = new Hypercore(Pear.config.storage + './alaricAppData/personalData', {
+      valueEncoding: 'json'
+    });
     export const globalApps = new Map();
     const personalApps = new Map();
     
@@ -170,7 +170,7 @@ const listProducts = async () => {
     const cmd = roomSearch ? highlightSearchTerm(app.cmd, roomSearch) : app.cmd;
 
     return `
-     <div style="position: relative; cursor: pointer;" class="app-item reveal" data-cmd="${app.cmd}" data-id="${app.id}" id="${app.id}">
+     <div style="position: relative; cursor: pointer;" class="room-item reveal" data-cmd="${app.cmd}" data-id="${app.id}" id="${app.id}">
           <div class="global-list-leftContent" style="display: flex; flex-direction: row; align-items: center; gap: 10px;">
             <div class="list--running hide"></div>
             <img 
@@ -194,7 +194,7 @@ const listProducts = async () => {
             <button class="slide-menu" style="background: transparent; border: 0; width: 30px; height: 30px;">
               <img style="width: 12px;" src="./assets/arrow.png" class="list--icon icon" />
             </button>
-            <button class="${['holesail', 'terminal'].includes(app.appType) ? 'openholesailPopUp' : 'run-cmd'}"
+            <button class="${['holesail'].includes(app.appType) ? 'openholesailPopUp' : 'run-cmd'}"
         data-tooltip="Run the Pear app" 
         style="background: transparent; border: 0; width: 30px; height: 30px;">
 
@@ -253,7 +253,7 @@ const listProducts = async () => {
 
     // <p style="font-weight: 100; color: #777; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%; font-size: 10px;">${cmd}</p>
 
-  document.querySelectorAll('.app-item').forEach(item => {
+  document.querySelectorAll('.app-item, .room-item').forEach(item => {
     item.addEventListener('click', (event) => {
       if (!event.target.closest('.list--side--menu')) {
         const appId = item.getAttribute('data-id');
@@ -322,18 +322,27 @@ const runPearCommand = (cmd) => {
   }
 
   console.log("Pear Command : ", cmd);
-  exec(cmd, (error, stdout, stderr) => {
-    if (appRunning) {
-      slideList.style.paddingLeft = '0';
-      appRunning.classList.add('hide');
-    }
-    if (error) {
-      console.error('Error executing pear run:', error.message);
-      notification('Failed to run the pear app. Check the console for details.', 'error');
-      return;
-    }
-    console.log('Pear run output:', stdout);
-  });
+  const match = cmd.match(/^pear run (pear:\/\/\S+)$/);
+  if (match) {
+    const pearUrl = match[1];
+    window.location.href = pearUrl; // Open the extracted pear URL
+    notification(`Running ${pearUrl}`, 'success');
+  } else {
+    console.error('Invalid Pear command:', cmd);
+    notification('Invalid Pear command. Make sure it starts with "pear run pear://".', 'error');
+  }
+  // exec(cmd, (error, stdout, stderr) => {
+  //   if (appRunning) {
+  //     slideList.style.paddingLeft = '0';
+  //     appRunning.classList.add('hide');
+  //   }
+  //   if (error) {
+  //     console.error('Error executing pear run:', error.message);
+  //     notification('Failed to run the pear app. Check the console for details.', 'error');
+  //     return;
+  //   }
+  //   console.log('Pear run output:', stdout);
+  // });
 
   notification(cmd, 'success');
 };
@@ -395,6 +404,13 @@ const addApp = async (appName, appType, command, appDescription, imageUrl) => {
     return;
   }
 
+  if(appType === 'pear'){
+    command = `pear run ${command}`;
+  }
+  if(appType === 'holesail'){
+    command = `holesail ${command}`;
+  }
+
   if (appType === 'room' && !command.includes('pear://keet/')) {
     notification('Wrong command input for Room', 'error');
     return;
@@ -444,11 +460,17 @@ document.getElementById('add--app--form').addEventListener('click', async (e) =>
     input: 'select',
     inputOptions: {
       pear: 'Pear',
-      holesail: 'Holesail',
+      // holesail: 'Holesail',
       room: 'Room',
     },
     inputPlaceholder: 'Choose an option',
     showCancelButton: true,
+    customClass: {
+      input: 'input',
+      confirmButton: "custom-confirm-button",
+      cancelButton: "custom-cancel-button",
+    popup: "font"
+    }
   });
 
   if (!appType) return;
@@ -458,6 +480,12 @@ document.getElementById('add--app--form').addEventListener('click', async (e) =>
     input: 'text',
     inputPlaceholder: `${appType} Name`,
     showCancelButton: true,
+    customClass: {
+      input: 'input',
+      confirmButton: "custom-confirm-button",
+      cancelButton: "custom-cancel-button",
+    popup: "font"
+    }
   });
 
   if (!appName) return;
@@ -467,14 +495,27 @@ document.getElementById('add--app--form').addEventListener('click', async (e) =>
     const inputPlaceholder = appType === 'room' 
     ? 'Enter Room Link (e.g., pear://keet/...)' 
     : appType === 'pear' 
-      ? 'Enter Pear Command (e.g., pear run pear://<pearKey>)' 
-      : 'Enter Holesail Key (e.g., holesail connection string)';
+      ? 'Enter Pear Key (e.g., pear://<pearKey>)' 
+      : 'Enter Holesail Connector (e.g., <connection string>)';
+
+      const inputLabel = appType === 'room' 
+      ? 'do not add pear run' 
+      : appType === 'pear' 
+        ? 'do not add pear run' 
+        : 'just add the key or connection string';
   
   const { value } = await Swal.fire({
     title: `Enter ${appType} Command`,
     input: 'text',
+    inputLabel,
     inputPlaceholder,
     showCancelButton: true,
+    customClass: {
+      input: 'input',
+      confirmButton: "custom-confirm-button",
+      cancelButton: "custom-cancel-button",
+    popup: "font"
+    }
   });
   
 
@@ -495,6 +536,12 @@ document.getElementById('add--app--form').addEventListener('click', async (e) =>
     inputLabel: 'Words limit 0/70',
     inputPlaceholder: 'Describe your app',
     showCancelButton: true,
+    customClass: {
+      textarea: 'textarea',
+      confirmButton: "custom-confirm-button",
+      cancelButton: "custom-cancel-button",
+      popup: "font"
+    },
     didOpen: () => {
       const textarea = Swal.getPopup().querySelector('textarea');
       const label = Swal.getPopup().querySelector('.swal2-input-label');
@@ -511,8 +558,6 @@ document.getElementById('add--app--form').addEventListener('click', async (e) =>
   }).then(({ value }) => {
     description = value || '';
   });
-
-  if (!description) return;
 
   let imageUrl = '';
   while (true) {
@@ -630,22 +675,16 @@ const openHolesailPopUp = (parentId, appCmd) => {
   });
 };
 
-function formatDate(timestamp) {
-  const date = new Date(timestamp);
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
-  const year = date.getFullYear();
-  
-  return `${day}/${month}/${year}`;
-}
-
 function revealOnScroll(){
   let listArea = document.querySelector('#global--page')
+  let roomArea = document.querySelector('#room--page');
   const globalList = document.querySelectorAll('.app-item');
+  const roomList = document.querySelectorAll('.room-item');
 
-  if (!listArea) return;
+  if (!listArea || !roomArea) return;
 
   let containerRect = listArea.getBoundingClientRect();
+  let roomRect = roomArea.getBoundingClientRect();
 
   globalList.forEach(item => {
     let itemRect = item.getBoundingClientRect();
@@ -655,15 +694,30 @@ function revealOnScroll(){
       item.classList.remove('reveal');
     }
   });
+  roomList.forEach(item => {
+    let itemRect = item.getBoundingClientRect();
+    if (itemRect.top >= roomRect.top && itemRect.bottom <= roomRect.bottom) {
+      item.classList.add('reveal');
+    } else {
+      item.classList.remove('reveal');
+    }
+  });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  const listArea = document.querySelector('#global--page');
-  if (listArea) {
-    listArea.addEventListener('scroll', revealOnScroll);
-    revealOnScroll();
+  const globalListArea = document.querySelector('#global--page');
+  const roomListArea = document.querySelector('#room--page');
+
+  if (globalListArea) {
+    globalListArea.addEventListener('scroll', revealOnScroll);
   }
+  if (roomListArea) {
+    roomListArea.addEventListener('scroll', revealOnScroll);
+  }
+
+  revealOnScroll();
 });
+
 
 
 // Personal App Code.
@@ -708,7 +762,6 @@ const listPersonalApps = async () => {
               .join('');
             };
           }
-            // <p style="font-weight: 100; color: #777; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%; font-size: 14px;">${app.cmd}</p>
 
 const addPersonalApp = async (app) => {
   if (!personalApps.has(app.id)) {
@@ -724,8 +777,108 @@ const addPersonalApp = async (app) => {
 // Call this function to fetch and display personal apps
 listPersonalApps();
 
+// Trending Apps
+const displayTrendingApps = () => {
+  const trendingAppsContainer = document.getElementById('trending--apps');
+  if (!trendingAppsContainer) return;
 
-const openPopup = (app) => {
+  const appsArray = Array.from(globalApps.values());
+  if (appsArray.length === 0) return;
+
+  const selectedApps = appsArray.sort(() => 0.5 - Math.random()).slice(0, 6);
+
+  trendingAppsContainer.innerHTML = selectedApps.map(app => `
+    <div class="trending-app-card" id="${app.cmd}">
+      <div class="blurred-bg" style="background-image: url('${app.logo || './assets/alaric.png'}');"></div>
+      <img src="${app.logo || './assets/alaric.png'}" />
+      <h3 style="font-weight: 900; margin-bottom: 4px;">${app.name}</h3>
+      <p style="position: absolute;font-weight: 900;margin-bottom: 4px;top: 1rem;right: 1rem;color: #adff2fc7;font-size: 10px;">${formatDate(app.createAt)}</p>
+      <p style="white-space: break-spaces; color: #ddd; font-size: 12px; font-weight: 900;">${app.appDescription ? app.appDescription : app.appType}</p>
+    </div>
+  `).join('');
+
+  document.querySelectorAll('.trending-app-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const cleanedCmd = card.id.replace('pear run ', '');
+        window.location.href = cleanedCmd;
+    });
+  });
+
+  document.querySelectorAll('.run-cmd').forEach(button => {
+    button.addEventListener('click', (e) => {
+      const cmd = e.currentTarget.getAttribute('data-cmd');
+      runPearCommand(cmd);
+    });
+  });
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  let contextMenu = document.createElement('div');
+  contextMenu.className = 'context-menu';
+  contextMenu.innerHTML = `
+    <ul>
+      <li id="run-option">Run</li>
+      <li id="copy-option">Copy Pear ID</li>
+    </ul>
+  `;
+  document.body.appendChild(contextMenu);
+
+  let selectedElement = null;
+
+  document.addEventListener('contextmenu', (event) => {
+    const targetItem = event.target.closest('.app-item, .room-item');
+    if (!targetItem) return;
+
+    event.preventDefault();
+    selectedElement = targetItem;
+
+    contextMenu.style.top = `${event.pageY}px`;
+    contextMenu.style.left = `${event.pageX}px`;
+    contextMenu.classList.add('active');
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!contextMenu.contains(event.target)) {
+      contextMenu.classList.remove('active');
+    }
+  });
+
+  document.getElementById('run-option').addEventListener('click', () => {
+    if (selectedElement) {
+      const appId = selectedElement.getAttribute('data-id'); // ✅ Using `data-id`
+      const app = globalApps.get(appId);
+      if(app.appType === 'pear'){
+        runPearCommand(app.cmd);
+      } else if(app.appType === 'holesail'){
+        console.log('click', app.id, app.cmd);
+        openHolesailPopUp(app.id, app.cmd);
+      }  else if (app.appType === 'room') {
+        window.location.href = app.cmd; // ✅ Open the URL in the browser
+      }
+    }
+    contextMenu.classList.remove('active');
+  });
+
+  document.getElementById('copy-option').addEventListener('click', () => {
+    if (selectedElement) {
+      const pearCmd = selectedElement.dataset.cmd; // ✅ Correctly fetching `data-cmd`
+      if (pearCmd) {
+        navigator.clipboard.writeText(pearCmd).then(() => {
+          notification(`Pear ID "${pearCmd}" copied!`, 'success');
+        }).catch(() => {
+          notification('Failed to copy Pear ID.', 'error');
+        });
+      }
+    }
+    contextMenu.classList.remove('active');
+  });
+});
+
+listProducts().then(displayTrendingApps);
+
+
+
+const openPopup = (app, type = 'global') => {
   console.log("App PopUp : ", app);
   const popup = document.getElementById('global--popUp');
   const overlay = document.querySelector('.overlay');
@@ -737,9 +890,9 @@ const openPopup = (app) => {
   let runButtonHTML = '';
 
   if (app.appType === 'room') {
-    runButtonHTML = `<a href="${app.cmd}" target="_blank" class="button" id="open-room-link" style="padding: 8px 15px; border: none; background:#ac0009; color: #fff; border-radius: 5px; cursor: pointer; margin-top: 0; box-shadow: inset 0 0 11px #FFF; text-decoration: none; text-align: center;">Open Room</a>`;
+    runButtonHTML = `<a href="${app.cmd}" target="_blank" class="button" id="open-room-link" style="padding: 8px 15px; border: none; background:#ac0009; color: #fff; border-radius: 5px; cursor: pointer; margin-top: 0; text-decoration: none; text-align: center;">Open Room</a>`;
   } else {
-    runButtonHTML = `<button class="button" id="run-command-btn" style="padding: 8px 15px; border: none; background:#ac0009; color: #fff; border-radius: 5px; cursor: pointer; margin-top: 0; box-shadow: inset 0 0 11px #FFF">Run</button>`;
+    runButtonHTML = `<button class="button" id="run-command-btn" style="padding: 8px 15px; border: none; background:#ac0009; color: #fff; border-radius: 5px; cursor: pointer; margin-top: 0;">Run</button>`;
   }
 
   popupContent.innerHTML = `
@@ -760,7 +913,7 @@ const openPopup = (app) => {
 
     <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 1rem;">
       ${runButtonHTML}
-      <button class="button" id="copy-command-btn" style="padding: 8px 15px; border: none; background: #00236e; color: #fff; border-radius: 5px; cursor: pointer; margin-top: 0; box-shadow: inset 0 0 11px #FFF">Copy</button>
+      <button class="button" id="copy-command-btn" style="padding: 8px 15px; border: none; background: #00236e; color: #fff; border-radius: 5px; cursor: pointer; margin-top: 0;">Copy</button>
       <button class="button" style="margin-top: 0; width: fit-content;" id="close-global--popUp">Close</button>
     </div>
   `;
@@ -779,7 +932,7 @@ const openPopup = (app) => {
   // Run command button (only if appType is not 'room')
   if (app.appType !== 'room') {
     document.getElementById('run-command-btn').addEventListener('click', () => {
-      if(['holesail', 'terminal'].includes(app.appType)){
+      if(['holesail'].includes(app.appType)){
         openHolesailPopUp(app.id, app.cmd);
       } else {
         runPearCommand(app.cmd);
@@ -798,33 +951,11 @@ const openPopup = (app) => {
   });
 };
 
-// Trending Apps
-const displayTrendingApps = () => {
-  const trendingAppsContainer = document.getElementById('trending--apps');
-  if (!trendingAppsContainer) return;
-
-  const appsArray = Array.from(globalApps.values());
-  if (appsArray.length === 0) return;
-
-  const selectedApps = appsArray.sort(() => 0.5 - Math.random()).slice(0, 6);
-
-  trendingAppsContainer.innerHTML = selectedApps.map(app => `
-    <div class="trending-app-card">
-      <div class="blurred-bg" style="background-image: url('${app.logo || './assets/alaric.png'}');"></div>
-      <img src="${app.logo || './assets/alaric.png'}" />
-      <h3 style="font-weight: 900; margin-bottom: 4px;">${app.name}</h3>
-      <p style="position: absolute;font-weight: 900;margin-bottom: 4px;top: 1rem;right: 1rem;color: #adff2fc7;font-size: 10px;">${formatDate(app.createAt)}</p>
-      <p style="white-space: break-spaces; color: #ddd; font-size: 12px; font-weight: 900;">${app.appDescription ? app.appDescription : app.appType}</p>
-    </div>
-  `).join('');
-
-  document.querySelectorAll('.run-cmd').forEach(button => {
-    button.addEventListener('click', (e) => {
-      const cmd = e.currentTarget.getAttribute('data-cmd');
-      runPearCommand(cmd);
-    });
-  });
-};
-
-
-listProducts().then(displayTrendingApps);
+function formatDate(timestamp) {
+    const date = new Date(timestamp);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    const year = date.getFullYear();
+    
+    return `${day}/${month}/${year}`;
+  }

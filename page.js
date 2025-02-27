@@ -41,7 +41,8 @@ document.addEventListener("DOMContentLoaded", () => {
     ".dash-myApps": 1, // My Apps
     ".dash-local": 2, // System Pear Apps
     ".dash-apps": 3, // Apps Directory
-    ".dash-rooms": 4 // Rooms Directory
+    ".dash-rooms": 4, // Rooms Directory
+    ".dash-premiumApps": 5
   };
 
   Object.entries(dashboardLinks).forEach(([selector, index]) => {
@@ -63,27 +64,3 @@ if (formCloseButton) {
     togglePage(0);
   });
 }
-
-// Gradient color change.
-
-// const elements = [
-//   { selector: ".dash-myApps", colors: ["#ff7eb390", "#fff"] },
-//   { selector: ".dash-local", colors: ["#ff9a8b90", "#fff"] },
-//   { selector: ".dash-apps", colors: ["#a18cd190", "#fff"] },
-//   { selector: ".dash-rooms", colors: ["#A29DFF", "#fff"] }
-// ];
-
-// let angle = 0;
-
-// function updateGradients() {
-//   angle = (angle + 1) % 360;
-//   elements.forEach(({ selector, colors }) => {
-//     const element = document.querySelector(selector);
-//     if (element) {
-//       element.style.background = `linear-gradient(${angle}deg, ${colors[0]}, ${colors[1]})`;
-//     }
-//   });
-// }
-
-// setInterval(updateGradients, 100);
-
