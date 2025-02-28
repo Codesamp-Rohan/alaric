@@ -286,12 +286,19 @@ const listProducts = async () => {
   document.querySelectorAll('.run-cmd').forEach(button => {
     button.addEventListener('click', (e) => {
       const parentItem = button.closest('.app-item');
+      const roomParentItem = button.closest('.room-item');
       const pearCmd = parentItem?.getAttribute('data-cmd');
+      const roomCmd = roomParentItem?.getAttribute('data-cmd');
+  
       if (pearCmd) {
         runPearCommand(pearCmd);
+      } else if (roomCmd) {
+        window.location.href = roomCmd;
       }
     });
   });
+  
+  
   document.querySelectorAll('.openholesailPopUp').forEach(button => {
     button.addEventListener('click', (e) => {
       const parentItem = button.closest('.app-item');

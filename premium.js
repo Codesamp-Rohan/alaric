@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const appCard = document.createElement("div");
         appCard.classList.add("premium-app");
         appCard.innerHTML = `
-        <img src="./assets/alaric.png" style="height: 70px;min-width: 70px;width: 70px;border-radius: 18px;border: 0;background: #333;box-shadow: 0 0 10px #777;padding: 6px;" />
+        <img src="./assets/alaric.png" style="height: 60px;min-width: 60px;width: 60px;border-radius: 18px;border: 0;background: #262626;padding: 4px;" />
         <div style="display: flex; flex-direction: column; justify-content: space-between; width: 100%;">
         <div style="display: flex; flex-direction: column; justify-content: space-between;">
            <p style="color: #333; font-size: 18px; font-weight: 900;">${app.name}</p>

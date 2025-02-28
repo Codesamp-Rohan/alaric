@@ -1036,10 +1036,6 @@ div:where(.swal2-container) div:where(.swal2-actions){
 .hidden { display: none; }
 #qr-section img { margin-top: 20px; }
 
-#premium--page .list--area{
-  padding: 1rem;
-}
-
 .premium-app{
   width: 100%;
   /* background-color: #eee; */
