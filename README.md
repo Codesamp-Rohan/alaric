@@ -100,4 +100,6 @@ you will get the app-link which is shareable.
 
 **Third-Party Plugin Support:** Allowing developers to create custom plugins for extending functionality.
 
+##
+
 Developed by: Rohan — Co-Founder of Holesail
