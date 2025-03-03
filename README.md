@@ -90,7 +90,7 @@ you will get the app-link which is shareable.
 
 ## Future Improvement and Implementation
 
-**Payment Improvement:**
+**Payment Improvement:** Full Lightning Network integration with user wallets, balance tracking, and payment history.
 
 **UI/UX Enhancements:** Implementing different themes.
 
