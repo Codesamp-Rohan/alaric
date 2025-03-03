@@ -1,7 +1,7 @@
 
 # Alaric
 
-Alaric is a decentralized peer-to-peer application designed for storing Pear apps and rooms.
+An app store for decentralized peer-to-peer apps built with Pear.
 
 It is a lightweight and efficient pear application store built on Hyperswarm and Hypercore technologies.
 
@@ -31,11 +31,11 @@ Hyperswarm facilitates connections between multiple peers, while Hypercore provi
 
 **Data Storage:** [hypercore](https://docs.pears.com/building-blocks/hypercore) - append-only log for storing data
 
-**Payment System:** Lightning Networ([Voltage](https://voltage.cloud)) - Bitcoin micropayments for in-app transactions using QR codes.
+**Payment System:** Lightning Network([Voltage](https://voltage.cloud)) - Bitcoin micropayments for in-app transactions using QR codes.
 
-**Security:** hypercore-crypto - Encryption and cryptographic verification for secure data transmission.
+**Security:** [hypercore-crypto](https://github.com/holepunchto/hypercore-crypto) - Encryption and cryptographic verification for secure data transmission.
 
-**Desgning:** [Figma](https://www.figma.com/design/2DX8bjRL8jlHbOTyzKkaaJ/Alaric?node-id=29-2&t=AKwMjqiOuJJKrF84-1) - Designed the Icon, Wireframe and Layout of Alaric.
+**Designing:** [Figma](https://www.figma.com/design/2DX8bjRL8jlHbOTyzKkaaJ/Alaric?node-id=29-2&t=AKwMjqiOuJJKrF84-1) - Designed the Icon, Wireframe and Layout of Alaric.
 
 
 
@@ -90,9 +90,7 @@ you will get the app-link which is shareable.
 
 ## Future Improvement and Implementation
 
-**Cross-Platform Compatibility:** Extending Alaric to support mobile platforms (Android and iOS) for seamless access across devices by using **bare-modules**.
-
-**Autopass:** remove hypercore and autopass to access more features like edit, delete, and many more.
+**Payment Improvement:**
 
 **UI/UX Enhancements:** Implementing different themes.
 
