@@ -385,8 +385,8 @@ const openPopup = (app) => {
       </div>
     </div>
     <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 1rem;">
-      <button class="button" id="run-command-btn" style="padding: 8px 15px; border: none; background:#ac0009; color: #fff; border-radius: 5px; cursor: pointer; margin-top: 0; box-shadow: inset 0 0 11px #FFF">Run</button>
-      <button class="button" id="copy-command-btn" style="padding: 8px 15px; border: none; background: #00236e; color: #fff; border-radius: 5px; cursor: pointer; margin-top: 0; box-shadow: inset 0 0 11px #FFF">Copy</button>
+      <button class="button" id="run-command-btn" style="padding: 8px 15px; border: none; background:#ac0009; color: #fff; border-radius: 5px; cursor: pointer; margin-top: 0; ">Run</button>
+      <button class="button" id="copy-command-btn" style="padding: 8px 15px; border: none; background: #00236e; color: #fff; border-radius: 5px; cursor: pointer; margin-top: 0; ">Copy</button>
       <button class="button" style="margin-top: 0; width: fit-content;" id="close-global--popUp">Close</button>
     </div>
   `;

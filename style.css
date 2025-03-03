@@ -282,6 +282,27 @@ body > h1:nth-of-ty(1) {
     justify-content: flex-start;
     overflow-x: hidden;
   }
+  .my-apps-btn{
+    border-radius: 6px;
+    background-color: transparent;
+    color: #fff;
+    font-weight: bold;
+    font-size: 12px;
+    border: 0;
+    filter: brightness(0.5);
+  }
+  #slider{
+    position: absolute; 
+    width: 100px;
+    height: calc(100%);
+    border-radius: 5px; 
+    /* border-radius: 0.5px solid #fff; */
+    transition: transform 0.3s ease; 
+    z-index: 0; 
+    pointer-events: none;
+    margin-top: 0;
+  }
+
   .app-item, .room-item{
     width: 100%;
     transition: 300ms;

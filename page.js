@@ -36,12 +36,11 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelector("#home--page").classList.remove("hide");
   togglePage(0); // Default to Dashboard
 
-  // ** Dashboard Click Events **
   const dashboardLinks = {
-    ".dash-myApps": 1, // My Apps
-    ".dash-local": 2, // System Pear Apps
-    ".dash-apps": 3, // Apps Directory
-    ".dash-rooms": 4, // Rooms Directory
+    ".dash-myApps": 1,
+    ".dash-local": 2,
+    ".dash-apps": 3,
+    ".dash-rooms": 4,
     ".dash-premiumApps": 5
   };
 
@@ -64,3 +63,10 @@ if (formCloseButton) {
     togglePage(0);
   });
 }
+
+document.querySelectorAll('.my-apps-btn').forEach((button, index) => {
+  button.addEventListener('click', () => {
+    const slider = document.getElementById('slider');
+    slider.style.transform = `translateX(${index * 116}px)`; // 100px + 10px gap
+  });
+});

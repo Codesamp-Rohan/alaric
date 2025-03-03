@@ -467,8 +467,8 @@ document.getElementById('add--app--form').addEventListener('click', async (e) =>
     input: 'select',
     inputOptions: {
       pear: 'Pear',
-      // holesail: 'Holesail',
       room: 'Room',
+      premium: 'Premium',
     },
     inputPlaceholder: 'Choose an option',
     showCancelButton: true,
@@ -496,6 +496,23 @@ document.getElementById('add--app--form').addEventListener('click', async (e) =>
   });
 
   if (!appName) return;
+
+  if(appType === 'premium'){
+    const {value : premiumAppPrice} = await Swal.fire({
+      title: `Enter the price of ${appName} in sats/min`,
+      input: 'number',
+      inputPlaceholder: `eg : 100sats/min`,
+      showCancelButton: true,
+      customClass: {
+        input: 'input',
+        confirmButton: "custom-confirm-button",
+        cancelButton: "custom-cancel-button",
+      popup: "font"
+    });
+
+    if(!premiumAppPrice) return;
+    price = premiumAppPrice;
+  }
 
   let command = '';
   while (true) {
