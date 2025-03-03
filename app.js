@@ -508,6 +508,7 @@ document.getElementById('add--app--form').addEventListener('click', async (e) =>
         confirmButton: "custom-confirm-button",
         cancelButton: "custom-cancel-button",
       popup: "font"
+      }
     });
 
     if(!premiumAppPrice) return;
