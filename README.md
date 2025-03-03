@@ -1,9 +1,9 @@
 
 # Alaric
 
-Alaric is a decentralized peer-to-peer application designed for managing Pear apps and rooms.
+Alaric is a decentralized peer-to-peer application designed for storing Pear apps and rooms.
 
-It is a lightweight and efficient application built on Hyperswarm and Hypercore technologies.
+It is a lightweight and efficient pear application store built on Hyperswarm and Hypercore technologies.
 
 Hyperswarm facilitates connections between multiple peers, while Hypercore provides a secure, append-only log for storing globally added apps, rooms on Keet, and premium applications.
 
@@ -17,7 +17,7 @@ Hyperswarm facilitates connections between multiple peers, while Hypercore provi
 
 ## Features
 
-- **Pear Hub** - Run and manage all Pear apps and rooms in one place.
+- **Pear App & Room Store** - Run and manage all Pear apps and rooms in one place.
 - **Decentralized by Design** - do not depend on centralized servers.
 - **User Friendly** - Simple, innovative, and efficient UI for smooth navigation
 - **Lightning Payment** - allowing the premium apps to run for minutes by paying on Sats
@@ -99,10 +99,5 @@ you will get the app-link which is shareable.
 **Advanced Access Controls:** Admin access to control the application and its data.
 
 **Third-Party Plugin Support:** Allowing developers to create custom plugins for extending functionality.
-## License
-
-This project is licensed under the [MIT](https://choosealicense.com/licenses/mit/)
-
-## 
 
 Developed by: Rohan — Co-Founder of Holesail
