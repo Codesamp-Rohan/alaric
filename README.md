@@ -11,6 +11,9 @@ Hyperswarm facilitates connections between multiple peers, while Hypercore provi
 
 ![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here) -->
 
+[![Alaric Demo](https://img.youtube.com/vi/YOUR_VIDEO_ID/maxresdefault.jpg)](https://youtu.be/ujH9ubN5jyc)
+
+
 ## Features
 
 - **Pear Hub** - Run and manage all Pear apps and rooms in one place.
