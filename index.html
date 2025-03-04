@@ -5,7 +5,7 @@
   <script type='module' src='./app.js'></script>
   <script type="module" src="./local.js"></script>
   <script type="module" src="./generateInvoice.js"></script>
-  <script type="module" src="./premium.js"></script>
+  <!-- <script type="module" src="./premium.js"></script> -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
@@ -14,7 +14,7 @@
   <div id="bar"><pear-ctrl></pear-ctrl></div>
   <div class="blob1"></div>
   <div class="blob2"></div>
-  <p class="version">Build V27</p>
+  <p class="version">Build V29</p>
   <!-- <p id="price"></p> -->
   <main>
     <div class="notification">
@@ -243,7 +243,20 @@
       <section class="page" id="premium--page">
         <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999;">
           <p class="page--header">Premium Apps</p>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <input type="text" style="margin-top: 0;border-radius: 5px;padding: 10px; width: 260px;" id="premium--search" placeholder="Search the App" />
+          <div class="dropdown">
+            <button class="dropbtn"><img src="./assets/sort.png" style="width: 8px;" />Sort By</button>
+            <div class="dropdown-content">
+              <a href="#" id="sortByOldest"><img src="./assets/oldest.png" style="width: 10px;" />Oldest</a>
+              <a href="#" id="sortByName"><img src="./assets/name.png" style="width: 10px;" />Name</a>
+              <a href="#" id="sortByNewest"><img src="./assets/newest.png" style="width: 10px;" />Newest</a>
+            </div>
+          </div>         
+          <button class="button reload--app" style="width: fit-content;font-size: 10px;font-weight: 900;margin-top: 0; color: #fff; background-color: #000;border-radius: 5px;">Reload App</button>
           </div>
+          </div>
+          <p id="premium-msg" class="hide">No Premium apps added yet!!!</p>
           <div class="list--area">
           </div>
       </section>

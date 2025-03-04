@@ -1,6 +1,11 @@
 {
   "name": "alaric",
   "main": "index.html",
+  "description": "P2P app store for the pear apps and rooms.",
+  "version": "1.0.0",
+  "payments": {
+    "price": "100"
+  },
   "pear": {
     "name": "alaric",
     "type": "desktop",
@@ -13,6 +18,7 @@
       "admin=hello"
     ],
     "links": [
+      "https://*","http://*","127.0.0.1","localhost",
       "https://api.qrserver.com",
       "https://6f58d87b0d.d.voltageapp.io",
       "https://alaric-crypto.t.voltageapp.io",
@@ -46,7 +52,6 @@
     "hypercore": "^10.38.2",
     "hypercore-crypto": "^3.4.2",
     "hyperswarm": "^4.8.4",
-    "openai": "^4.85.1",
     "sweetalert2": "^11.17.2",
     "xterm": "^5.3.0",
     "xterm-addon-fit": "^0.8.0"

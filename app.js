@@ -7,6 +7,9 @@ import b4a from 'b4a';
 import { createRequire } from 'module';
 import { notification } from './notification';
 import Swal from 'sweetalert2';
+// import { listPremiumProducts } from './premium';
+import { displayInvoice } from './generateInvoice';
+import { pearBinaryPath } from './local';
 const require = createRequire(import.meta.url);
 const { exec } = require('child_process');
 
@@ -26,8 +29,10 @@ let feed = new Hypercore(Pear.config.storage + './alaricAppData', {
   let personalAppFeed = new Hypercore(Pear.config.storage + './alaricAppData/personalData', {
       valueEncoding: 'json'
     });
+    let premiumAppFeed = new Hypercore(Pear.config.storage + './alaricAppData/premiumDataTest');
     export const globalApps = new Map();
     const personalApps = new Map();
+    export const premiumApps = new Map();
     
     function generateId() {
       return `${Date.now()}-${Math.floor(Math.random() * 1e6).toString(36)}`;
@@ -87,13 +92,14 @@ document.getElementById('sortRoomByOldest').addEventListener('click', (e) => {
 const listProducts = async () => {
   await feed.update();
   globalApps.clear();
-
   for await (const product of feed.createReadStream()) {
     if (!globalApps.has(product.id)) {
       globalApps.set(product.id, product);
     }
   }
 
+  // premiumAppsSection.innerHTML = "";
+  
   const globalAppsSection = document.querySelector('#global--page .list--area');
   const globalRoomSection = document.querySelector('#room--page .list--area');
   
@@ -120,7 +126,6 @@ const listProducts = async () => {
   const searchTerm = document.getElementById('global--search').value.trim().toLowerCase();
   const roomSearch = document.getElementById('room--search').value.trim().toLowerCase();
   console.log("Room search term:", roomSearch);  
-
   let appsToDisplay = Array.from(globalApps.values()).filter(app => app.appType !== 'room');
   let roomsToDisplay = Array.from(globalApps.values()).filter(app => app.appType === 'room');
 
@@ -139,7 +144,6 @@ const listProducts = async () => {
       return appName.includes(roomSearch) || appCmd.includes(roomSearch);
     });    
   }  
-
   appsToDisplay = appsToDisplay.sort((a, b) => {
     if (sortOrder === 'asc') {
       return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
@@ -161,10 +165,6 @@ const listProducts = async () => {
     return 0;
   });
 
-//   <button class="edit-app" style="background: transparent; border: 0; width: 30px; height: 30px;position: absolute;right: 0;top: 50%;transform: translateY(-50%);">
-//   <img style="width: 12px;" src="./assets/edit.png" class="list--icon icon" />
-// </button>  
-
   globalRoomSection.innerHTML = roomsToDisplay.map(app => {
     const name = roomSearch ? highlightSearchTerm(app.name, roomSearch) : app.name;
     const cmd = roomSearch ? highlightSearchTerm(app.cmd, roomSearch) : app.cmd;
@@ -183,9 +183,6 @@ const listProducts = async () => {
                 <p style="font-size: 11px; font-weight: 900; color: #247538; white-space: nowrap;">${app.appType}</p>
                   <p style="font-size: 11px; font-weight: 900; color: #247538; white-space: nowrap;">|</p>
                  <p style="font-size: 9px; font-weight: 900; color: #247538; white-space: nowrap;">${formatDate(app.createAt)}</p>
-                 <a href="${(app.link === undefined || app.link === '') ? 'https://github.com/Codesamp-Rohan' : app.link}" target="_blank">
-                 <img src="./assets/link.png" style="width: 11px; height: 11px;" />
-                 </a>
               </div>
               <p style="font-weight: 100; color: #777; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%; font-size: 14px;">${app.appDescription ? app.appDescription : cmd}</p>
             </div>
@@ -226,9 +223,6 @@ const listProducts = async () => {
                 <p style="font-size: 11px; font-weight: 900; color: #247538; white-space: nowrap;">${app.appType}</p>
                   <p style="font-size: 11px; font-weight: 900; color: #247538; white-space: nowrap;">|</p>
                  <p style="font-size: 9px; font-weight: 900; color: #247538; white-space: nowrap;">${formatDate(app.createAt)}</p>
-                   <a href="${(app.link === undefined || app.link === '') ? 'https://github.com/Codesamp-Rohan' : app.link}" target="_blank">
-                 <img src="./assets/link.png" style="width: 11px; height: 11px;" />
-                 </a>
               </div>
               <p style="font-weight: 100; color: #777; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%; font-size: 14px;">${app.appDescription ? app.appDescription : cmd}</p>
             </div>
@@ -355,17 +349,34 @@ const runPearCommand = (cmd) => {
 };
 
 const addProduct = async (product, fromPeer = false) => {
-  if (!globalApps.has(product.id)) {
-    globalApps.set(product.id, product);
-    if (!fromPeer) {
-      await feed.append(product);
-      swarm.connections.forEach((conn) => {
-        conn.write(JSON.stringify({ type: 'app-data', data: product }));
-      });
+  console.log(product.appType);
+  console.log(product.imageUrl);
+
+  if (product.appType === 'premium') {
+    if (!premiumApps.has(product.id)) {
+      premiumApps.set(product.id, product);
+      if (!fromPeer) {
+        await premiumAppFeed.append(JSON.stringify(product));
+        swarm.connections.forEach((conn) => {
+          conn.write(JSON.stringify({ type: 'premium-app-data', data: product }));
+        });
+      }
+      listPremiumApps();
     }
-    listProducts();
+  } else {
+    if (!globalApps.has(product.id)) {
+      globalApps.set(product.id, product);
+      if (!fromPeer) {
+        await feed.append(product);
+        swarm.connections.forEach((conn) => {
+          conn.write(JSON.stringify({ type: 'app-data', data: product }));
+        });
+      }
+      listProducts();
+    }
   }
 };
+
 
 const joinSwarm = () => {
   const topic = crypto.discoveryKey(b4a.from(COMMON_GLOBAL_KEY, 'hex'));
@@ -375,16 +386,25 @@ const joinSwarm = () => {
   swarm.on('connection', (connection, details) => {
     console.log('New connection:', details);
     feed.replicate(connection);
+    premiumAppFeed.replicate(connection);
 
     globalApps.forEach(app => {
       connection.write(JSON.stringify({ type: 'app-data', data: app }));
     });
+
+    premiumApps.forEach(app => {
+      connection.write(JSON.stringify({ type: 'premium-app-data', data: app }));
+    })
 
     connection.on('data', async (data) => {
       try {
         const message = JSON.parse(data.toString());
         if (message.type === 'app-data') {
           console.log('Received app data from peer:', message.data);
+          await addProduct(message.data);
+        }
+        if(message.type === 'premium-app-data'){
+          console.log('Receive a premium app from peer:', message.data);
           await addProduct(message.data);
         }
       } catch (err) {
@@ -404,18 +424,57 @@ const joinSwarm = () => {
 
 process.on('exit', cleanup);
 
-
-const addApp = async (appName, appType, command, appDescription, imageUrl) => {
+const addPremiumApp = async (appName, appType, command, appDescription, imageUrl, price) => {
   if (!appName || !command) {
     notification('Please fill in the required fields.', 'error');
     return;
   }
 
+  const getDefaultLogoBase64 = async (url) => {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('Failed to fetch default logo');
+      const blob = await response.blob();
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    } catch (error) {
+      console.error('Error fetching default logo:', error);
+      return ''; // Return empty string on failure
+    }
+  };
+
+  let logoBase64 = imageUrl && typeof imageUrl === 'string' && imageUrl.startsWith('data:image') ? imageUrl : await getDefaultLogoBase64('./assets/alaric.png');
+
+  const premiumAppData = {
+    type: 'premium-app-data',
+    id: generateId(),
+    name: appName,
+    createAt: Date.now(),
+    appType: appType,
+    appDescription: appDescription,
+    logo: logoBase64,
+    cmd: command,
+    price: price,
+    hide: false,
+  };
+
+  try {
+    await addProduct(premiumAppData);
+    addPersonalApp(premiumAppData);
+    console.log('Premium app added successfully:', premiumAppData);
+  } catch (err) {
+    console.error('Error adding premium app:', err);
+  }
+};
+
+
+const addApp = async (appName, appType, command, appDescription, imageUrl) => {
   if(appType === 'pear'){
     command = `pear run ${command}`;
-  }
-  if(appType === 'holesail'){
-    command = `holesail ${command}`;
   }
 
   if (appType === 'room' && !command.includes('pear://keet/')) {
@@ -453,10 +512,47 @@ const addApp = async (appName, appType, command, appDescription, imageUrl) => {
     appDescription: appDescription,
     logo: logoBase64,
     cmd: command,
+    price: false
   };
 
-  await addProduct(appData);
-  addPersonalApp(appData);
+  if (appType === 'pear') {
+    const filteredCmd = command.replace(/^pear run /, '');
+    const dumpCommand = `${pearBinaryPath} dump ${filteredCmd}/package.json -`;
+    console.log('Executing dump command:', dumpCommand);
+    exec(dumpCommand, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`Error executing dump command: ${error.message}`);
+        return;
+      }
+      if (stderr) {
+        console.error(`Dump command stderr: ${stderr}`);
+        return;
+      }
+      try {
+        // Extract JSON data from stdout using regex
+        const jsonMatch = stdout.match(/{[\s\S]*}/);
+        if (jsonMatch) {
+          const packageData = JSON.parse(jsonMatch[0]);
+          console.log(`Package.json Data for ${appName}:`, packageData);
+          appData.name = packageData.name || appName;
+          appData.appDescription = packageData.description || appDescription;
+          if(packageData.payments){
+            appData.price = packageData.payments.price || false;
+          }
+          console.log('Updated App Data:', appData);
+          addProduct(appData);
+          addPersonalApp(appData);
+        } else {
+          console.error('No JSON found in dump output');
+        }
+      } catch (parseError) {
+        console.error('Failed to parse package.json data:', parseError);
+      }
+    });
+  } else {
+    await addProduct(appData);
+    addPersonalApp(appData);
+  }
 };
 
 document.getElementById('add--app--form').addEventListener('click', async (e) => {
@@ -476,113 +572,28 @@ document.getElementById('add--app--form').addEventListener('click', async (e) =>
       input: 'input',
       confirmButton: "custom-confirm-button",
       cancelButton: "custom-cancel-button",
-    popup: "font"
+      popup: "font"
     }
   });
 
   if (!appType) return;
 
-  const { value: appName } = await Swal.fire({
-    title: `Name of the ${appType}`,
-    input: 'text',
-    inputPlaceholder: `${appType} Name`,
-    showCancelButton: true,
-    customClass: {
-      input: 'input',
-      confirmButton: "custom-confirm-button",
-      cancelButton: "custom-cancel-button",
-    popup: "font"
-    }
-  });
-
-  if (!appName) return;
-
-  if(appType === 'premium'){
-    const {value : premiumAppPrice} = await Swal.fire({
-      title: `Enter the price of ${appName} in sats/min`,
-      input: 'number',
-      inputPlaceholder: `eg : 100sats/min`,
-      showCancelButton: true,
-      customClass: {
-        input: 'input',
-        confirmButton: "custom-confirm-button",
-        cancelButton: "custom-cancel-button",
-      popup: "font"
-      }
-    });
-
-    if(!premiumAppPrice) return;
-    price = premiumAppPrice;
-  }
-
   let command = '';
-  while (true) {
-    const inputPlaceholder = appType === 'room' 
-    ? 'Enter Room Link (e.g., pear://keet/...)' 
-    : appType === 'pear' 
-      ? 'Enter Pear Key (e.g., pear://<pearKey>)' 
-      : 'Enter Holesail Connector (e.g., <connection string>)';
-
-      const inputLabel = appType === 'room' 
-      ? 'do not add pear run' 
-      : appType === 'pear' 
-        ? 'do not add pear run' 
-        : 'just add the key or connection string';
-  
-  const { value } = await Swal.fire({
+  const { value: appCommand } = await Swal.fire({
     title: `Enter ${appType} Command`,
     input: 'text',
-    inputLabel,
-    inputPlaceholder,
+    inputPlaceholder: `${appType === 'pear' ? 'pear://<pearKey>' : 'pear://keet/...'}`,
     showCancelButton: true,
     customClass: {
       input: 'input',
       confirmButton: "custom-confirm-button",
       cancelButton: "custom-cancel-button",
-    popup: "font"
-    }
-  });
-  
-
-    if (!value) return;
-
-    if (appType === 'room' && !value.includes('pear://keet/')) {
-      await Swal.fire({ title: 'Error', text: 'Wrong command input for Room. Please enter a valid command.', icon: 'error' });
-      continue;
-    }
-    command = value;
-    break;
-  }
-
-  let description = '';
-  await Swal.fire({
-    title: 'Enter Description',
-    input: 'textarea',
-    inputLabel: 'Words limit 0/70',
-    inputPlaceholder: 'Describe your app',
-    showCancelButton: true,
-    customClass: {
-      textarea: 'textarea',
-      confirmButton: "custom-confirm-button",
-      cancelButton: "custom-cancel-button",
       popup: "font"
-    },
-    didOpen: () => {
-      const textarea = Swal.getPopup().querySelector('textarea');
-      const label = Swal.getPopup().querySelector('.swal2-input-label');
-  
-      textarea.addEventListener('input', () => {
-        if (textarea.value.length > 70) {
-          textarea.value = textarea.value.slice(0, 70);
-        }
-        if (label) {
-          label.textContent = `Words limit ${textarea.value.length}/70`;
-        }
-      });
     }
-  }).then(({ value }) => {
-    description = value || '';
   });
+
+  if (!appCommand) return;
+  command = appCommand;
 
   let imageUrl = '';
   while (true) {
@@ -594,10 +605,10 @@ document.getElementById('add--app--form').addEventListener('click', async (e) =>
       },
       showCancelButton: true,
     });
-  
+
     if (!file) break;
 
-    if (file.size > 500 * 1024) { // 500KB limit
+    if (file.size > 500 * 1024) {
       await Swal.fire({
         title: 'Error',
         text: 'File size exceeds 500KB. Please upload a smaller file.',
@@ -605,28 +616,77 @@ document.getElementById('add--app--form').addEventListener('click', async (e) =>
       });
       continue;
     }
-  
+
     const reader = new FileReader();
     imageUrl = await new Promise((resolve) => {
-      reader.onload = () => resolve(reader.result);
+      reader.onload = () => resolve(reader.result.trim());
       reader.readAsDataURL(file);
     });
-    break;
+    if (imageUrl) break;
   }
 
-  await addApp(appName, appType, command, description, imageUrl);
+  if (appType === 'room') {
+    const { value: appName } = await Swal.fire({
+      title: `Name of the ${appType}`,
+      input: 'text',
+      inputPlaceholder: `${appType} Name`,
+      showCancelButton: true,
+      customClass: {
+        input: 'input',
+        confirmButton: "custom-confirm-button",
+        cancelButton: "custom-cancel-button",
+        popup: "font"
+      }
+    });
+
+    if (!appName) return;
+
+    let description = '';
+    await Swal.fire({
+      title: 'Enter Description',
+      input: 'textarea',
+      inputLabel: 'Words limit 0/70',
+      inputPlaceholder: 'Describe your app',
+      showCancelButton: true,
+      customClass: {
+        textarea: 'textarea',
+        confirmButton: "custom-confirm-button",
+        cancelButton: "custom-cancel-button",
+        popup: "font"
+      },
+      didOpen: () => {
+        const textarea = Swal.getPopup().querySelector('textarea');
+        const label = Swal.getPopup().querySelector('.swal2-input-label');
+
+        textarea.addEventListener('input', () => {
+          if (textarea.value.length > 70) {
+            textarea.value = textarea.value.slice(0, 70);
+          }
+          if (label) {
+            label.textContent = `Words limit ${textarea.value.length}/70`;
+          }
+        });
+      }
+    }).then(({ value }) => {
+      description = value || '';
+    });
+
+    console.log(appName);
+    console.log(description);
+    console.log(imageUrl);
+    await addApp(appName, appType, command, description, imageUrl);
+  } else {
+    console.log(command);
+    await addApp('', appType, command, '', imageUrl);
+  }
 
   await Swal.fire({
     title: 'App Created!',
     html: `<strong>Type:</strong> ${appType} <br>
-           <strong>Name:</strong> ${appName} <br>
-           <strong>Command:</strong> ${command} <br>
-           <strong>Description:</strong> ${description} <br>
-           ${imageUrl ? `<img src="${imageUrl}" alt="App Icon" style="max-width: 100px; display: block; margin: 10px auto;">` : 'No icon uploaded'}`,
+           <strong>Command:</strong> ${command}`,
     icon: 'success',
   });
 });
-
 
 process.on('SIGINT', async () => {
   console.log('Shutting down...');
@@ -642,6 +702,7 @@ const reloadApp = () => {
   console.log('Reloading...');
   feed.close();
   personalAppFeed.close();
+  premiumAppFeed.close();
   Pear.reload();
 }
 
@@ -743,6 +804,81 @@ document.addEventListener('DOMContentLoaded', () => {
   revealOnScroll();
 });
 
+// List Premium App
+const listPremiumApps = async () => {
+  premiumApps.clear();
+
+  for await (const appData of premiumAppFeed.createReadStream()) {
+    try {
+      const app = JSON.parse(appData.toString());
+      if (!premiumApps.has(app.id)) {
+        premiumApps.set(app.id, app);
+      }
+    } catch (error) {
+      console.error('Failed to parse premium app data:', error);
+    }
+  }
+
+  const premiumAppsSection = document.querySelector('#premium--page .list--area');
+  const premiumAppsNo = document.querySelector('#premium-apps-no');
+  premiumAppsNo.innerHTML = premiumApps.size;
+  document.querySelector('#dash-premium-no').innerHTML = premiumAppsNo.innerHTML;
+
+  if (premiumApps.size === 0) {
+    document.getElementById('premium-msg').classList.remove('hide');
+  } else {
+      document.getElementById('premium-msg').classList.add('hide');
+      const premiumSearch = document.getElementById('premium--search').value.trim().toLowerCase();
+      let premiumToDisplay = Array.from(premiumApps.values());
+  
+      if (premiumSearch) {
+        premiumToDisplay = premiumToDisplay.filter(app => {
+          const appName = app.name?.toLowerCase() || "";
+          const appCmd = app.cmd?.toLowerCase() || "";
+          return appName.includes(premiumSearch) || appCmd.includes(premiumSearch);
+        });
+      }
+      
+      premiumAppsSection.innerHTML = premiumToDisplay
+      .map(app => {
+          const name = premiumSearch ? highlightSearchTerm(app.name, premiumSearch) : app.name;
+          const cmd = premiumSearch ? highlightSearchTerm(app.cmd, premiumSearch) : app.cmd;
+          return `
+          <div style="display: flex;position: relative;cursor: pointer; align-items: center;justify-content: space-between;" class="room-item reveal" data-cmd="${cmd}" data-id="${app.id}" id="${app.id}">
+            <div class="global-list-leftContent" style="display: flex; flex-direction: row; align-items: center; gap: 10px;">
+              <div class="list--running hide"></div>
+              <img 
+                style="box-shadow: inset 0 0 13px #ddd;height: 60px; min-width: 60px; width: 60px; padding: 7px; background: #000; border-radius: 13px; border: 0;" 
+                src="${app.logo || './assets/alaric.png'}" 
+                alt="App Logo"/>
+              <div style="width: 100%; display: flex; flex-direction: column;">
+                <div style="display: flex; gap: 10px; align-items: center;">
+                  <p style="color: #333; font-size: 18px; font-weight: 900;"><strong>${name}</strong></p>
+                  <p style="font-size: 11px; font-weight: 900; color: #247538; white-space: nowrap;">${app.appType}</p>
+                  <p style="font-size: 11px; font-weight: 900; color: #247538; white-space: nowrap;">|</p>
+                  <p style="font-size: 9px; font-weight: 900; color: #247538; white-space: nowrap;">${formatDate(app.createAt)}</p>
+                </div>
+                <p style="font-weight: 100; color: #777; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%; font-size: 14px;">${app.appDescription ? app.appDescription : cmd}</p>
+              </div>
+            </div>
+            <button id="pay-btn" class="button buy-button" data-app='${JSON.stringify(app)}'>${app.price} sats</button>
+          </div>
+        `})
+        .join('');
+
+        document.querySelectorAll(".buy-button").forEach(button => {
+          button.addEventListener("click", (event) => {
+              const appData = JSON.parse(event.target.getAttribute("data-app"));
+              console.log(appData);
+              displayInvoice(appData);
+          });
+      });
+  }
+  
+  // Add Event Listener for Search
+  const premiumSearchInput = document.getElementById('premium--search');
+  premiumSearchInput.addEventListener('input', listPremiumApps);
+};
 
 
 // Personal App Code.
@@ -767,6 +903,7 @@ const listPersonalApps = async () => {
   personalAppsSection.innerHTML = Array.from(personalApps.values())
     .map(app => `
         <div style="position: relative; cursor: pointer; width: 20%;height: 180px;border-radius: 20px; background-color: #000; box-shadow: 0 0 10px #bbb; overflow: hidden; box-shadow: 6px 7px 10px #a5a5a5;" class="personal-app-item reveal" data-cmd="${app.cmd}" data-id="${app.id}" id="${app.appId}">
+        ${app.appType === 'premium' ? `<img src="./assets/star.png" class="premium-badge"/>` : ''}
           <div class="personal-list" style="display: flex;flex-direction: column;align-items: center;gap: 10px;position: relative;background-color: #000000;width: 100%;height: 100%;box-shadow: inset 0 0 30px #ddd;">
             <img 
               style="transition: 300ms;border-radius: 13px;border: 0;width: 85%;position: absolute;top: 48%;transform: translateY(-61%);" 
@@ -799,8 +936,9 @@ const addPersonalApp = async (app) => {
   }
 };
 
-// Call this function to fetch and display personal apps
+// Call this function to fetch and display personal and premium apps
 listPersonalApps();
+listPremiumApps();
 
 // Trending Apps
 const displayTrendingApps = () => {

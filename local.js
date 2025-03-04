@@ -6,8 +6,8 @@ import { notification } from './notification';
 const require = createRequire(import.meta.url);
 const { exec } = require('child_process');
 
-let permitsPath;
-let pearBinaryPath;
+export let permitsPath;
+export let pearBinaryPath;
 let pearAppType;
 
 if (os.platform() === 'darwin') {

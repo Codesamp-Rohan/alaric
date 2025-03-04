@@ -136,6 +136,14 @@ body > h1:nth-of-ty(1) {
     border: 1px solid #ccc;
     background-color: #f0f0f0;
   }
+  .premium-badge{
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 20px;
+    height: 20px;
+    z-index: 900;
+  }
   #local-apps-no, #global-apps-no, #pinned-apps-no, #personal-apps-no, #onlyGames-apps-no, #rooms-apps-no, #admin-apps-no, #global-rooms-no, #premium-apps-no{
     position: absolute;
     right: 14px;
@@ -262,6 +270,9 @@ body > h1:nth-of-ty(1) {
     font-size: 12px;
     box-shadow: 0 !important;
   }
+  .buy-button{
+    width: fit-content;
+  }
   button{
     cursor: pointer;
   }
@@ -289,7 +300,7 @@ body > h1:nth-of-ty(1) {
     font-weight: bold;
     font-size: 12px;
     border: 0;
-    filter: brightness(0.5);
+    filter: brightness(0.8);
   }
   #slider{
     position: absolute; 

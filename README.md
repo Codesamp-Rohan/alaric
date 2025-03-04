@@ -22,6 +22,33 @@ Hyperswarm facilitates connections between multiple peers, while Hypercore provi
 - **User Friendly** - Simple, innovative, and efficient UI for smooth navigation
 - **Lightning Payment** - allowing the premium apps to run for minutes by paying on Sats
 
+## 🔥 Important Notice
+
+If you are adding a pear app in **Alaric**, ensure your app's `package.json` is like this : 
+
+1. For a normal pear app
+
+```bash
+{
+    "name": "name_of_the_app",
+    "description": "the description of the app",
+}
+```
+
+2. For a premium pear app
+
+```bash
+{
+    "name": "name_of_the_app",
+    "description": "the description of the app",
+    "payments": {
+        "price": 100,
+    }
+}
+```
+### For example
+
+![App Screenshot](./assets/alaricSS.png)
 
 ## Tech Stack
 
