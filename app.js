@@ -23,13 +23,13 @@ let sortOrder = 'newest';
 // let personalAppFeed = new Hypercore(Pear.config.storage + './personalApp1', {
 //   valueEncoding: 'json'
 // });
-let feed = new Hypercore(Pear.config.storage + './alaricAppData', {
+let feed = new Hypercore(Pear.config.storage + './alaricAppDataTest', {
     valueEncoding: 'json',
   });
-  let personalAppFeed = new Hypercore(Pear.config.storage + './alaricAppData/personalData', {
+  let personalAppFeed = new Hypercore(Pear.config.storage + './alaricAppDataTest/personalData', {
       valueEncoding: 'json'
     });
-    let premiumAppFeed = new Hypercore(Pear.config.storage + './alaricAppData/premiumDataTest');
+    let premiumAppFeed = new Hypercore(Pear.config.storage + './alaricAppDataTest/premiumDataTest');
     export const globalApps = new Map();
     const personalApps = new Map();
     export const premiumApps = new Map();
@@ -352,18 +352,6 @@ const addProduct = async (product, fromPeer = false) => {
   console.log(product.appType);
   console.log(product.imageUrl);
 
-  if (product.appType === 'premium') {
-    if (!premiumApps.has(product.id)) {
-      premiumApps.set(product.id, product);
-      if (!fromPeer) {
-        await premiumAppFeed.append(JSON.stringify(product));
-        swarm.connections.forEach((conn) => {
-          conn.write(JSON.stringify({ type: 'premium-app-data', data: product }));
-        });
-      }
-      listPremiumApps();
-    }
-  } else {
     if (!globalApps.has(product.id)) {
       globalApps.set(product.id, product);
       if (!fromPeer) {
@@ -374,7 +362,6 @@ const addProduct = async (product, fromPeer = false) => {
       }
       listProducts();
     }
-  }
 };
 
 
@@ -403,10 +390,10 @@ const joinSwarm = () => {
           console.log('Received app data from peer:', message.data);
           await addProduct(message.data);
         }
-        if(message.type === 'premium-app-data'){
-          console.log('Receive a premium app from peer:', message.data);
-          await addProduct(message.data);
-        }
+        // if(message.type === 'premium-app-data'){
+        //   console.log('Receive a premium app from peer:', message.data);
+        //   await addProduct(message.data);
+        // }
       } catch (err) {
         notification('Failed to parse incoming data:', 'error');
         // console.log('Raw data received:', data.toString());
@@ -424,52 +411,53 @@ const joinSwarm = () => {
 
 process.on('exit', cleanup);
 
-const addPremiumApp = async (appName, appType, command, appDescription, imageUrl, price) => {
-  if (!appName || !command) {
-    notification('Please fill in the required fields.', 'error');
-    return;
-  }
+// const addPremiumApp = async (product, fromPeer = false) => {
+//   appName, appType, command, appDescription, imageUrl, price
+//   if (!product.appName || !product.command) {
+//     notification('Please fill in the required fields.', 'error');
+//     return;
+//   }
 
-  const getDefaultLogoBase64 = async (url) => {
-    try {
-      const response = await fetch(url);
-      if (!response.ok) throw new Error('Failed to fetch default logo');
-      const blob = await response.blob();
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      });
-    } catch (error) {
-      console.error('Error fetching default logo:', error);
-      return ''; // Return empty string on failure
-    }
-  };
+//   const getDefaultLogoBase64 = async (url) => {
+//     try {
+//       const response = await fetch(url);
+//       if (!response.ok) throw new Error('Failed to fetch default logo');
+//       const blob = await response.blob();
+//       return new Promise((resolve, reject) => {
+//         const reader = new FileReader();
+//         reader.onloadend = () => resolve(reader.result);
+//         reader.onerror = reject;
+//         reader.readAsDataURL(blob);
+//       });
+//     } catch (error) {
+//       console.error('Error fetching default logo:', error);
+//       return ''; // Return empty string on failure
+//     }
+//   };
 
-  let logoBase64 = imageUrl && typeof imageUrl === 'string' && imageUrl.startsWith('data:image') ? imageUrl : await getDefaultLogoBase64('./assets/alaric.png');
+//   let logoBase64 = product.imageUrl && typeof product.imageUrl === 'string' && product.imageUrl.startsWith('data:image') ? product.imageUrl : await getDefaultLogoBase64('./assets/alaric.png');
 
-  const premiumAppData = {
-    type: 'premium-app-data',
-    id: generateId(),
-    name: appName,
-    createAt: Date.now(),
-    appType: appType,
-    appDescription: appDescription,
-    logo: logoBase64,
-    cmd: command,
-    price: price,
-    hide: false,
-  };
+//   const premiumAppData = {
+//     type: 'premium-app-data',
+//     id: generateId(),
+//     name: product.appName,
+//     createAt: Date.now(),
+//     appType: product.appType,
+//     appDescription: product.appDescription,
+//     logo: logoBase64,
+//     cmd: product.command,
+//     price: product.price,
+//     hide: false,
+//   };
 
-  try {
-    await addProduct(premiumAppData);
-    addPersonalApp(premiumAppData);
-    console.log('Premium app added successfully:', premiumAppData);
-  } catch (err) {
-    console.error('Error adding premium app:', err);
-  }
-};
+//   try {
+//     await addProduct(premiumAppData);
+//     addPersonalApp(premiumAppData);
+//     console.log('Premium app added successfully:', premiumAppData);
+//   } catch (err) {
+//     console.error('Error adding premium app:', err);
+//   }
+// };
 
 
 const addApp = async (appName, appType, command, appDescription, imageUrl) => {
@@ -538,6 +526,7 @@ const addApp = async (appName, appType, command, appDescription, imageUrl) => {
           appData.appDescription = packageData.description || appDescription;
           if(packageData.payments){
             appData.price = packageData.payments.price || false;
+            console.log(appData.price);
           }
           console.log('Updated App Data:', appData);
           addProduct(appData);
@@ -564,7 +553,6 @@ document.getElementById('add--app--form').addEventListener('click', async (e) =>
     inputOptions: {
       pear: 'Pear',
       room: 'Room',
-      premium: 'Premium',
     },
     inputPlaceholder: 'Choose an option',
     showCancelButton: true,
@@ -806,18 +794,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // List Premium App
 const listPremiumApps = async () => {
+  await feed.update();
   premiumApps.clear();
 
-  for await (const appData of premiumAppFeed.createReadStream()) {
+  for await (const appData of feed.createReadStream()) {
     try {
-      const app = JSON.parse(appData.toString());
-      if (!premiumApps.has(app.id)) {
+      const app = appData;
+      console.log(app.price);
+
+      if (app.hasOwnProperty('price') && app.price !== false && !premiumApps.has(app.id)) {
         premiumApps.set(app.id, app);
       }
     } catch (error) {
       console.error('Failed to parse premium app data:', error);
     }
   }
+
+  console.log("Filtered Premium Apps:", Array.from(premiumApps.values()));
 
   const premiumAppsSection = document.querySelector('#premium--page .list--area');
   const premiumAppsNo = document.querySelector('#premium-apps-no');
@@ -827,58 +820,60 @@ const listPremiumApps = async () => {
   if (premiumApps.size === 0) {
     document.getElementById('premium-msg').classList.remove('hide');
   } else {
-      document.getElementById('premium-msg').classList.add('hide');
-      const premiumSearch = document.getElementById('premium--search').value.trim().toLowerCase();
-      let premiumToDisplay = Array.from(premiumApps.values());
-  
-      if (premiumSearch) {
-        premiumToDisplay = premiumToDisplay.filter(app => {
-          const appName = app.name?.toLowerCase() || "";
-          const appCmd = app.cmd?.toLowerCase() || "";
-          return appName.includes(premiumSearch) || appCmd.includes(premiumSearch);
-        });
-      }
-      
-      premiumAppsSection.innerHTML = premiumToDisplay
-      .map(app => {
-          const name = premiumSearch ? highlightSearchTerm(app.name, premiumSearch) : app.name;
-          const cmd = premiumSearch ? highlightSearchTerm(app.cmd, premiumSearch) : app.cmd;
-          return `
-          <div style="display: flex;position: relative;cursor: pointer; align-items: center;justify-content: space-between;" class="room-item reveal" data-cmd="${cmd}" data-id="${app.id}" id="${app.id}">
-            <div class="global-list-leftContent" style="display: flex; flex-direction: row; align-items: center; gap: 10px;">
-              <div class="list--running hide"></div>
-              <img 
-                style="box-shadow: inset 0 0 13px #ddd;height: 60px; min-width: 60px; width: 60px; padding: 7px; background: #000; border-radius: 13px; border: 0;" 
-                src="${app.logo || './assets/alaric.png'}" 
-                alt="App Logo"/>
-              <div style="width: 100%; display: flex; flex-direction: column;">
-                <div style="display: flex; gap: 10px; align-items: center;">
-                  <p style="color: #333; font-size: 18px; font-weight: 900;"><strong>${name}</strong></p>
-                  <p style="font-size: 11px; font-weight: 900; color: #247538; white-space: nowrap;">${app.appType}</p>
-                  <p style="font-size: 11px; font-weight: 900; color: #247538; white-space: nowrap;">|</p>
-                  <p style="font-size: 9px; font-weight: 900; color: #247538; white-space: nowrap;">${formatDate(app.createAt)}</p>
-                </div>
-                <p style="font-weight: 100; color: #777; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%; font-size: 14px;">${app.appDescription ? app.appDescription : cmd}</p>
-              </div>
-            </div>
-            <button id="pay-btn" class="button buy-button" data-app='${JSON.stringify(app)}'>${app.price} sats</button>
-          </div>
-        `})
-        .join('');
+    document.getElementById('premium-msg').classList.add('hide');
 
-        document.querySelectorAll(".buy-button").forEach(button => {
-          button.addEventListener("click", (event) => {
-              const appData = JSON.parse(event.target.getAttribute("data-app"));
-              console.log(appData);
-              displayInvoice(appData);
-          });
+    const premiumSearch = document.getElementById('premium--search').value.trim().toLowerCase();
+    let premiumToDisplay = Array.from(premiumApps.values());
+
+    if (premiumSearch) {
+      premiumToDisplay = premiumToDisplay.filter(app => {
+        const appName = app.name?.toLowerCase() || "";
+        const appCmd = app.cmd?.toLowerCase() || "";
+        return appName.includes(premiumSearch) || appCmd.includes(premiumSearch);
       });
+    }
+
+    premiumAppsSection.innerHTML = premiumToDisplay.map(app => {
+      const name = premiumSearch ? highlightSearchTerm(app.name, premiumSearch) : app.name;
+      const cmd = premiumSearch ? highlightSearchTerm(app.cmd, premiumSearch) : app.cmd;
+
+      return `
+      <div style="display: flex;position: relative;cursor: pointer; align-items: center;justify-content: space-between;" class="room-item reveal" data-cmd="${cmd}" data-id="${app.id}" id="${app.id}">
+        <div class="global-list-leftContent" style="display: flex; flex-direction: row; align-items: center; gap: 10px;">
+          <div class="list--running hide"></div>
+          <img 
+            style="box-shadow: inset 0 0 13px #ddd;height: 60px; min-width: 60px; width: 60px; padding: 7px; background: #000; border-radius: 13px; border: 0;" 
+            src="${app.logo || './assets/alaric.png'}" 
+            alt="App Logo"/>
+          <div style="width: 100%; display: flex; flex-direction: column;">
+            <div style="display: flex; gap: 10px; align-items: center;">
+              <p style="color: #333; font-size: 18px; font-weight: 900;"><strong>${name}</strong></p>
+              <p style="font-size: 11px; font-weight: 900; color: #247538; white-space: nowrap;">${app.appType}</p>
+              <p style="font-size: 11px; font-weight: 900; color: #247538; white-space: nowrap;">|</p>
+              <p style="font-size: 9px; font-weight: 900; color: #247538; white-space: nowrap;">${formatDate(app.createAt)}</p>
+            </div>
+            <p style="font-weight: 100; color: #777; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%; font-size: 14px;">${app.appDescription ? app.appDescription : cmd}</p>
+          </div>
+        </div>
+        <button id="pay-btn" class="button buy-button" data-app='${JSON.stringify(app)}'>${app.price} sats</button>
+      </div>
+      `;
+    }).join('');
+
+    // Payment button functionality
+    document.querySelectorAll(".buy-button").forEach(button => {
+      button.addEventListener("click", (event) => {
+        const appData = JSON.parse(event.target.getAttribute("data-app"));
+        console.log("Selected Premium App:", appData);
+        displayInvoice(appData);
+      });
+    });
   }
-  
-  // Add Event Listener for Search
-  const premiumSearchInput = document.getElementById('premium--search');
-  premiumSearchInput.addEventListener('input', listPremiumApps);
+
+  // Event Listener for search
+  document.getElementById('premium--search').addEventListener('input', listPremiumApps);
 };
+
 
 
 // Personal App Code.
@@ -903,7 +898,7 @@ const listPersonalApps = async () => {
   personalAppsSection.innerHTML = Array.from(personalApps.values())
     .map(app => `
         <div style="position: relative; cursor: pointer; width: 20%;height: 180px;border-radius: 20px; background-color: #000; box-shadow: 0 0 10px #bbb; overflow: hidden; box-shadow: 6px 7px 10px #a5a5a5;" class="personal-app-item reveal" data-cmd="${app.cmd}" data-id="${app.id}" id="${app.appId}">
-        ${app.appType === 'premium' ? `<img src="./assets/star.png" class="premium-badge"/>` : ''}
+         ${app.hasOwnProperty('price') && app.price !== false ? `<img src="./assets/star.png" class="premium-badge"/>` : ''}
           <div class="personal-list" style="display: flex;flex-direction: column;align-items: center;gap: 10px;position: relative;background-color: #000000;width: 100%;height: 100%;box-shadow: inset 0 0 30px #ddd;">
             <img 
               style="transition: 300ms;border-radius: 13px;border: 0;width: 85%;position: absolute;top: 48%;transform: translateY(-61%);" 

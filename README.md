@@ -20,7 +20,7 @@ Hyperswarm facilitates connections between multiple peers, while Hypercore provi
 - **Pear App & Room Store** - Run and manage all Pear apps and rooms in one place.
 - **Decentralized by Design** - do not depend on centralized servers.
 - **User Friendly** - Simple, innovative, and efficient UI for smooth navigation
-- **Lightning Payment** - allowing the premium apps to run for minutes by paying on Sats
+- **Lightning Payment** - allowing the premium apps to run after one time payment using Sats
 
 ## 🔥 Important Notice
 
@@ -100,7 +100,7 @@ git clone https://github.com/Codesamp-Rohan/alaric.git
 cd alaric
 npm install
 ```
-after cloning Alaric, to the run the application.
+after cloning Alaric, to run the application.
 ```bash
 pear run -d .
 ```
@@ -113,7 +113,7 @@ pear stage dev
 pear release dev
 pear seed dev
 ```
-you will get the app-link which is shareable.
+you will get the pear-key which is shareable.
 
 ## Future Improvement and Implementation
 

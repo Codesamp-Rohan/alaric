@@ -89,8 +89,9 @@ async function checkPaymentStatus(r_hash, appName) {
             });
 
             const data = await response.json();
-            console.log(data);
-            if (data.settled) {
+            console.log(data.settled);
+            console.log(data.amt_paid_sat);
+            if (data.amt_paid_sat > 0 || data.settled) {
                 new Audio("./assets/payment_success.mp3").play();
                 Swal.fire({ title: "Payment Successful!", text: `You have unlocked ${appName}!`, icon: "success" });
                 unlockApp(appName);
