@@ -7,32 +7,31 @@ import b4a from 'b4a';
 import { createRequire } from 'module';
 import { notification } from './notification';
 import Swal from 'sweetalert2';
-// import { listPremiumProducts } from './premium';
 import { displayInvoice } from './generateInvoice';
-import { pearBinaryPath } from './local';
+import { getPearBinaryPath } from './config';
+import { ENV } from './env';
 const require = createRequire(import.meta.url);
 const { exec } = require('child_process');
 
 const swarm = new Hyperswarm();
-const COMMON_GLOBAL_KEY = '7ea84e502381b03fdba9039fb2b714e49daa9184740c35c8b07bf13d13bd6ef8';
+const COMMON_GLOBAL_KEY = ENV.globalKey;
 
+let pearBinary = getPearBinaryPath();
+console.log(pearBinary);
 let sortOrder = 'newest';
-// let feed = new Hypercore(Pear.config.storage + './mazeData1', {
-//   valueEncoding: 'json',
-// });
-// let personalAppFeed = new Hypercore(Pear.config.storage + './personalApp1', {
-//   valueEncoding: 'json'
-// });
-let feed = new Hypercore(Pear.config.storage + './alaricAppDataTest', {
+let feed = new Hypercore(Pear.config.storage + ENV.globalHyperCore, {
     valueEncoding: 'json',
-  });
-  let personalAppFeed = new Hypercore(Pear.config.storage + './alaricAppDataTest/personalData', {
+});
+let personalAppFeed = new Hypercore(Pear.config.storage + ENV.personalHyperCore, {
       valueEncoding: 'json'
-    });
-    let premiumAppFeed = new Hypercore(Pear.config.storage + './alaricAppDataTest/premiumDataTest');
+});
+let pinAppFeed = new Hypercore(Pear.config.storage + ENV.pinHyperCore, {
+  valueEncoding: 'json'
+})
     export const globalApps = new Map();
     const personalApps = new Map();
     export const premiumApps = new Map();
+    const pinApps = new Map();
     
     function generateId() {
       return `${Date.now()}-${Math.floor(Math.random() * 1e6).toString(36)}`;
@@ -105,7 +104,7 @@ const listProducts = async () => {
   
   const globalAppsNo = document.querySelector('#global-apps-no');
   const globalRoomsNo = document.querySelector('#global-rooms-no');
-  const appCount = Array.from(globalApps.values()).filter(app => app.appType !== 'room').length;
+  const appCount = Array.from(globalApps.values()).filter(app => app.appType !== 'room' && app.appType !== 'premium').length;
   console.log(appCount);
   globalAppsNo.innerHTML = appCount;
   document.querySelector('#dash-apps-no').innerHTML = globalAppsNo.innerHTML;
@@ -126,7 +125,7 @@ const listProducts = async () => {
   const searchTerm = document.getElementById('global--search').value.trim().toLowerCase();
   const roomSearch = document.getElementById('room--search').value.trim().toLowerCase();
   console.log("Room search term:", roomSearch);  
-  let appsToDisplay = Array.from(globalApps.values()).filter(app => app.appType !== 'room');
+  let appsToDisplay = Array.from(globalApps.values()).filter(app => app.appType !== 'room' && app.appType !== 'premium');
   let roomsToDisplay = Array.from(globalApps.values()).filter(app => app.appType === 'room');
 
   if (searchTerm) {
@@ -195,10 +194,10 @@ const listProducts = async () => {
         data-tooltip="Run the Pear app" 
         style="background: transparent; border: 0; width: 30px; height: 30px;">
 
-              <img style="width: 15px;" src="./assets/run.png" class="list--icon icon" />
+              <img style="width: 15px;" src="./assets/run.png" class="icon" />
             </button>
             <button class="copy-pearID" data-tooltip="Copy Pear ID" style="background: transparent; border: 0; width: 30px; height: 30px;">
-              <img style="width: 15px;" src="./assets/copy.png" class="list--icon icon" />
+              <img style="width: 15px;" src="./assets/copy.png" class="icon" />
             </button>
           </div>
         </div>
@@ -234,10 +233,10 @@ const listProducts = async () => {
                     <button class="${['holesail', 'terminal'].includes(app.appType) ? 'openholesailPopUp' : 'run-cmd'}"
         data-tooltip="Run the Pear app" 
         style="background: transparent; border: 0; width: 30px; height: 30px;">
-              <img style="width: 15px;" src="./assets/run.png" class="list--icon icon" />
+              <img style="width: 15px;" src="./assets/run.png" class="icon" />
             </button>
             <button class="copy-pearID" data-tooltip="Copy Pear ID" style="background: transparent; border: 0; width: 30px; height: 30px;">
-              <img style="width: 15px;" src="./assets/copy.png" class="list--icon icon" />
+              <img style="width: 15px;" src="./assets/copy.png" class="icon" />
             </button>
           </div>
         </div>
@@ -361,7 +360,15 @@ const addProduct = async (product, fromPeer = false) => {
         });
       }
       listProducts();
+      listPremiumApps();
     }
+
+    await Swal.fire({
+      title: 'App Created!',
+      html: `<strong>Type:</strong> ${product.appType} <br>
+             <strong>Command:</strong> ${product.command}`,
+      icon: 'success',
+    });
 };
 
 
@@ -373,7 +380,6 @@ const joinSwarm = () => {
   swarm.on('connection', (connection, details) => {
     console.log('New connection:', details);
     feed.replicate(connection);
-    premiumAppFeed.replicate(connection);
 
     globalApps.forEach(app => {
       connection.write(JSON.stringify({ type: 'app-data', data: app }));
@@ -410,55 +416,6 @@ const joinSwarm = () => {
 };
 
 process.on('exit', cleanup);
-
-// const addPremiumApp = async (product, fromPeer = false) => {
-//   appName, appType, command, appDescription, imageUrl, price
-//   if (!product.appName || !product.command) {
-//     notification('Please fill in the required fields.', 'error');
-//     return;
-//   }
-
-//   const getDefaultLogoBase64 = async (url) => {
-//     try {
-//       const response = await fetch(url);
-//       if (!response.ok) throw new Error('Failed to fetch default logo');
-//       const blob = await response.blob();
-//       return new Promise((resolve, reject) => {
-//         const reader = new FileReader();
-//         reader.onloadend = () => resolve(reader.result);
-//         reader.onerror = reject;
-//         reader.readAsDataURL(blob);
-//       });
-//     } catch (error) {
-//       console.error('Error fetching default logo:', error);
-//       return ''; // Return empty string on failure
-//     }
-//   };
-
-//   let logoBase64 = product.imageUrl && typeof product.imageUrl === 'string' && product.imageUrl.startsWith('data:image') ? product.imageUrl : await getDefaultLogoBase64('./assets/alaric.png');
-
-//   const premiumAppData = {
-//     type: 'premium-app-data',
-//     id: generateId(),
-//     name: product.appName,
-//     createAt: Date.now(),
-//     appType: product.appType,
-//     appDescription: product.appDescription,
-//     logo: logoBase64,
-//     cmd: product.command,
-//     price: product.price,
-//     hide: false,
-//   };
-
-//   try {
-//     await addProduct(premiumAppData);
-//     addPersonalApp(premiumAppData);
-//     console.log('Premium app added successfully:', premiumAppData);
-//   } catch (err) {
-//     console.error('Error adding premium app:', err);
-//   }
-// };
-
 
 const addApp = async (appName, appType, command, appDescription, imageUrl) => {
   if(appType === 'pear'){
@@ -505,7 +462,7 @@ const addApp = async (appName, appType, command, appDescription, imageUrl) => {
 
   if (appType === 'pear') {
     const filteredCmd = command.replace(/^pear run /, '');
-    const dumpCommand = `${pearBinaryPath} dump ${filteredCmd}/package.json -`;
+    const dumpCommand = `${pearBinary} dump ${filteredCmd}/package.json -`;
     console.log('Executing dump command:', dumpCommand);
     exec(dumpCommand, (error, stdout, stderr) => {
       if (error) {
@@ -526,13 +483,24 @@ const addApp = async (appName, appType, command, appDescription, imageUrl) => {
           appData.appDescription = packageData.description || appDescription;
           if(packageData.payments){
             appData.price = packageData.payments.price || false;
+            appData.appType = 'premium';
             console.log(appData.price);
           }
           console.log('Updated App Data:', appData);
           addProduct(appData);
           addPersonalApp(appData);
         } else {
+          notification('the command you entered is not correct', 'error');
           console.error('No JSON found in dump output');
+          Swal.fire({
+            title: 'Something went wrong!!!',
+            text: 'I think you entered the wrong command.',
+            icon: 'error',
+            confirmButton: true,
+            customClass: {
+              confirmButton: "custom-confirm-button",
+            }
+          });
         }
       } catch (parseError) {
         console.error('Failed to parse package.json data:', parseError);
@@ -585,15 +553,34 @@ document.getElementById('add--app--form').addEventListener('click', async (e) =>
 
   let imageUrl = '';
   while (true) {
-    const { value: file } = await Swal.fire({
+    const { value: file, isDismissed } = await Swal.fire({
       title: 'Upload an Icon (Max 500KB)',
       input: 'file',
       inputAttributes: {
         accept: 'image/*',
       },
       showCancelButton: true,
-    });
-
+      customClass: {
+        input: 'input',
+        confirmButton: "custom-confirm-button",
+        cancelButton: "custom-cancel-button",
+        popup: "font"
+      }
+    }).then((result) => ({
+      value: result.value,
+      isDismissed: result.isDismissed || result.dismiss === Swal.DismissReason.cancel,
+    }));
+    if(isDismissed){
+      await Swal.fire({
+        title: 'Cancelled',
+        text: 'App creation was cancelled.',
+        icon: 'warning',
+        customClass: {
+          cancelButton: "custom-cancel-button",
+        }
+      });
+      return;
+    };
     if (!file) break;
 
     if (file.size > 500 * 1024) {
@@ -667,13 +654,6 @@ document.getElementById('add--app--form').addEventListener('click', async (e) =>
     console.log(command);
     await addApp('', appType, command, '', imageUrl);
   }
-
-  await Swal.fire({
-    title: 'App Created!',
-    html: `<strong>Type:</strong> ${appType} <br>
-           <strong>Command:</strong> ${command}`,
-    icon: 'success',
-  });
 });
 
 process.on('SIGINT', async () => {
@@ -690,7 +670,6 @@ const reloadApp = () => {
   console.log('Reloading...');
   feed.close();
   personalAppFeed.close();
-  premiumAppFeed.close();
   Pear.reload();
 }
 
@@ -751,14 +730,17 @@ const openHolesailPopUp = (parentId, appCmd) => {
 
 function revealOnScroll(){
   let listArea = document.querySelector('#global--page')
+  let premiumArea = document.querySelector('#premium--page')
   let roomArea = document.querySelector('#room--page');
   const globalList = document.querySelectorAll('.app-item');
   const roomList = document.querySelectorAll('.room-item');
+  const premiumList = document.querySelectorAll('.premium-app-item');
 
-  if (!listArea || !roomArea) return;
+  if (!listArea || !roomArea || !premiumArea) return;
 
   let containerRect = listArea.getBoundingClientRect();
   let roomRect = roomArea.getBoundingClientRect();
+  let premiumRect = premiumArea.getBoundingClientRect();
 
   globalList.forEach(item => {
     let itemRect = item.getBoundingClientRect();
@@ -776,17 +758,29 @@ function revealOnScroll(){
       item.classList.remove('reveal');
     }
   });
+  premiumList.forEach(item => {
+    let itemRect = item.getBoundingClientRect();
+    if (itemRect.top >= premiumRect.top && itemRect.bottom <= premiumRect.bottom) {
+      item.classList.add('reveal');
+    } else {
+      item.classList.remove('reveal');
+    }
+  })
 }
 
 document.addEventListener('DOMContentLoaded', () => {
   const globalListArea = document.querySelector('#global--page');
   const roomListArea = document.querySelector('#room--page');
+  const premiumListArea = document.querySelector('#premium--page');
 
   if (globalListArea) {
     globalListArea.addEventListener('scroll', revealOnScroll);
   }
   if (roomListArea) {
     roomListArea.addEventListener('scroll', revealOnScroll);
+  }
+  if(premiumListArea){
+    premiumListArea.addEventListener('scroll', revealOnScroll);
   }
 
   revealOnScroll();
@@ -802,7 +796,7 @@ const listPremiumApps = async () => {
       const app = appData;
       console.log(app.price);
 
-      if (app.hasOwnProperty('price') && app.price !== false && !premiumApps.has(app.id)) {
+      if (app.hasOwnProperty('price') && app.price !== false && !premiumApps.has(app.id) && app.appType === 'premium') {
         premiumApps.set(app.id, app);
       }
     } catch (error) {
@@ -833,12 +827,12 @@ const listPremiumApps = async () => {
       });
     }
 
-    premiumAppsSection.innerHTML = premiumToDisplay.map(app => {
+    premiumAppsSection.innerHTML = premiumToDisplay.reverse().map(app => {
       const name = premiumSearch ? highlightSearchTerm(app.name, premiumSearch) : app.name;
       const cmd = premiumSearch ? highlightSearchTerm(app.cmd, premiumSearch) : app.cmd;
 
       return `
-      <div style="display: flex;position: relative;cursor: pointer; align-items: center;justify-content: space-between;" class="room-item reveal" data-cmd="${cmd}" data-id="${app.id}" id="${app.id}">
+      <div style="display: flex;position: relative;cursor: pointer; align-items: center;justify-content: space-between;" class="premium-app-item reveal" data-cmd="${app.cmd}" data-id="${app.id}" id="${app.id}">
         <div class="global-list-leftContent" style="display: flex; flex-direction: row; align-items: center; gap: 10px;">
           <div class="list--running hide"></div>
           <img 
@@ -852,7 +846,7 @@ const listPremiumApps = async () => {
               <p style="font-size: 11px; font-weight: 900; color: #247538; white-space: nowrap;">|</p>
               <p style="font-size: 9px; font-weight: 900; color: #247538; white-space: nowrap;">${formatDate(app.createAt)}</p>
             </div>
-            <p style="font-weight: 100; color: #777; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%; font-size: 14px;">${app.appDescription ? app.appDescription : cmd}</p>
+            <p style="font-weight: 100; color: #777; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; font-size: 14px;">${app.appDescription ? app.appDescription : cmd}</p>
           </div>
         </div>
         <button id="pay-btn" class="button buy-button" data-app='${JSON.stringify(app)}'>${app.price} sats</button>
@@ -874,7 +868,48 @@ const listPremiumApps = async () => {
   document.getElementById('premium--search').addEventListener('input', listPremiumApps);
 };
 
+const listPinnedApps = async () => {
+  pinApps.clear();
 
+  for await (const app of pinAppFeed.createReadStream()) {
+    if (!pinApps.has(app.id)) {
+      pinApps.set(app.id, app);
+      // console.log(app);
+    }
+  }
+
+  const pinAppsSection = document.querySelector('#personal--page .pinned--list--area');
+  const pinAppsNo = document.querySelector('#pinned-apps-no');
+  pinAppsNo.innerHTML = pinApps.size;
+  // document.querySelector('#dash-myApps-no').innerHTML = pinAppsNo.innerHTML;
+
+  if (pinApps.size === 0) {
+    pinAppsSection.innerHTML = `<p>No apps/rooms are yet pinned by you.</p>`;
+  } else {
+  pinAppsSection.innerHTML = Array.from(pinApps.values()).reverse()
+    .map(app => `
+        <div style="position: relative; cursor: pointer; width: 20%;height: 180px;border-radius: 20px; background-color: #000; box-shadow: 0 0 10px #bbb; box-shadow: 6px 7px 10px #a5a5a5;" class="personal-app-item reveal" data-cmd="${app.cmd}" data-id="${app.id}" id="${app.appId}">
+         ${app.hasOwnProperty('price') && app.price !== false && app.appType === 'premium' ? `<img src="./assets/star.png" class="premium-badge"/>` : ''}
+          <div class="personal-list" style="display: flex;flex-direction: column;align-items: center;gap: 10px;position: relative;background-color: #000000;width: 100%;height: 100%;box-shadow: inset 0 0 30px #ddd; border-radius: 20px;">
+            <img 
+              style="transition: 300ms;border-radius: 13px;border: 0;width: 85%;position: absolute;top: 48%;transform: translateY(-61%);" 
+              src="${app.logo || './assets/alaric.png'}" 
+              alt="App Logo"/>
+            <div style="border-radius: 20px; width: 100%;display: flex;flex-direction: column;position: absolute;
+    bottom: 0;height: 100%;background: linear-gradient(0deg, rgb(0 0 0) 0%, rgb(0 0 0) 19%, rgb(0 0 0 / 0%) 95%, rgba(255, 255, 255, 0) 100%);padding: 1.5rem 1rem;justify-content: flex-end;">
+            <p style="color: #fff; font-size: 12px; font-weight: 900;"><strong>${app.name}</strong></p>
+            <div style="display: flex; gap: 3px; align-items: center;">
+                <p style="font-size: 8px; font-weight: 900; color:#61ff88; white-space: nowrap;">${app.appType}</p>
+                <p style="font-size: 8px; font-weight: 900; color: #61ff88; white-space: nowrap;">|</p>
+                <p style="font-size: 8px; font-weight: 900; color: #61ff88; white-space: nowrap;">${formatDate(app.createAt)}</p>
+              </div>
+              </div>
+              </div>
+              </div>
+              `)
+              .join('');
+            };
+          }
 
 // Personal App Code.
 const listPersonalApps = async () => {
@@ -893,18 +928,18 @@ const listPersonalApps = async () => {
   document.querySelector('#dash-myApps-no').innerHTML = personalAppsNo.innerHTML;
 
   if (personalApps.size === 0) {
-    personalAppsSection.innerHTML = `<p>No apps are yet added by you.</p>`;
+    personalAppsSection.innerHTML = `<p>No apps/rooms are yet added by you.</p>`;
   } else {
-  personalAppsSection.innerHTML = Array.from(personalApps.values())
+  personalAppsSection.innerHTML = Array.from(personalApps.values()).reverse()
     .map(app => `
-        <div style="position: relative; cursor: pointer; width: 20%;height: 180px;border-radius: 20px; background-color: #000; box-shadow: 0 0 10px #bbb; overflow: hidden; box-shadow: 6px 7px 10px #a5a5a5;" class="personal-app-item reveal" data-cmd="${app.cmd}" data-id="${app.id}" id="${app.appId}">
-         ${app.hasOwnProperty('price') && app.price !== false ? `<img src="./assets/star.png" class="premium-badge"/>` : ''}
-          <div class="personal-list" style="display: flex;flex-direction: column;align-items: center;gap: 10px;position: relative;background-color: #000000;width: 100%;height: 100%;box-shadow: inset 0 0 30px #ddd;">
+        <div style="position: relative; cursor: pointer; width: 20%;height: 180px;border-radius: 20px; background-color: #000; box-shadow: 0 0 10px #bbb; box-shadow: 6px 7px 10px #a5a5a5;" class="personal-app-item reveal" data-cmd="${app.cmd}" data-id="${app.id}" id="${app.appId}">
+         ${app.hasOwnProperty('price') && app.price !== false && app.appType === 'premium' ? `<img src="./assets/star.png" class="premium-badge"/>` : ''}
+          <div class="personal-list" style="display: flex;flex-direction: column;align-items: center;gap: 10px;position: relative;background-color: #000000;width: 100%;height: 100%;box-shadow: inset 0 0 30px #ddd; border-radius: 20px;">
             <img 
-              style="transition: 300ms;border-radius: 13px;border: 0;width: 85%;position: absolute;top: 48%;transform: translateY(-61%);" 
+              style="transition: 300ms;border-radius: 13px;border: 0;width: 85%;height: 67%;object-fit: cover;position: absolute;top: 48%;transform: translateY(-61%);" 
               src="${app.logo || './assets/alaric.png'}" 
               alt="App Logo"/>
-            <div style="width: 100%;display: flex;flex-direction: column;position: absolute;
+            <div style="border-radius: 20px; width: 100%;display: flex;flex-direction: column;position: absolute;
     bottom: 0;height: 100%;background: linear-gradient(0deg, rgb(0 0 0) 0%, rgb(0 0 0) 19%, rgb(0 0 0 / 0%) 95%, rgba(255, 255, 255, 0) 100%);padding: 1.5rem 1rem;justify-content: flex-end;">
             <p style="color: #fff; font-size: 12px; font-weight: 900;"><strong>${app.name}</strong></p>
             <div style="display: flex; gap: 3px; align-items: center;">
@@ -934,6 +969,7 @@ const addPersonalApp = async (app) => {
 // Call this function to fetch and display personal and premium apps
 listPersonalApps();
 listPremiumApps();
+listPinnedApps();
 
 // Trending Apps
 const displayTrendingApps = () => {
@@ -975,8 +1011,9 @@ document.addEventListener('DOMContentLoaded', () => {
   contextMenu.className = 'context-menu';
   contextMenu.innerHTML = `
     <ul>
-      <li id="run-option">Run</li>
-      <li id="copy-option">Copy Pear ID</li>
+      <li id="run-option"><img src="./assets/run.png" class="icon" />Run</li>
+      <li id="copy-option"><img src="./assets/copy.png" class="icon" />Copy Pear ID</li>
+      <li id="pin-option"><img src="./assets/pin.png" class="icon" />Pin</li>
     </ul>
   `;
   document.body.appendChild(contextMenu);
@@ -1030,6 +1067,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     contextMenu.classList.remove('active');
   });
+
+  document.getElementById('pin-option').addEventListener('click', () => {
+    if(selectedElement){
+      const appId = selectedElement.getAttribute('data-id');
+      const app = globalApps.get(appId);
+
+      if(app){
+        if(!pinApps.has(app.id)){
+          pinAppFeed.append(app);
+          pinApps.set(app.id, app);
+          notification(`${app.name} pinned successfully.`, 'success');
+          console.log('Pinned App:', app);
+        } else {
+          notification(`${app.name} is already pinned.`, 'info');
+        }
+      }
+    }
+    contextMenu.classList.remove('active');
+  })
 });
 
 listProducts().then(displayTrendingApps);
@@ -1037,6 +1093,7 @@ listProducts().then(displayTrendingApps);
 
 
 const openPopup = (app, type = 'global') => {
+  if(app.appType === 'premium') return;
   console.log("App PopUp : ", app);
   const popup = document.getElementById('global--popUp');
   const overlay = document.querySelector('.overlay');

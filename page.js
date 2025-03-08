@@ -70,3 +70,45 @@ document.querySelectorAll('.my-apps-btn').forEach((button, index) => {
     slider.style.transform = `translateX(${index * 116}px)`; // 100px + 10px gap
   });
 });
+
+document.querySelectorAll('.my-apps-btn').forEach(button => {
+  button.addEventListener('click', (e) => {
+    const index = Number(e.currentTarget.getAttribute('data-value'));
+    console.log(index);
+
+    const personalArea = document.querySelector('.personal--list--area');
+    const pinnedArea = document.querySelector('.pinned--list--area');
+
+    if (index === 0) {
+      pinnedArea.classList.add('slide-out-right');  // Slide out Pinned Apps
+      personalArea.classList.remove('hide', 'slide-out-left');  
+      personalArea.classList.add('slide-in-left');  // Slide in Personal Apps
+
+      setTimeout(() => {
+        pinnedArea.classList.add('hide');
+        pinnedArea.classList.remove('slide-out-right', 'slide-in-right');
+      }, 300);
+
+      document.getElementById('my-pin-li-text').innerText = 'My Apps';
+      document.getElementById('personal-apps-no').classList.remove('hide');
+      document.getElementById('pinned-apps-no').classList.add('hide');
+      document.getElementById('my-apps-icon').src = './assets/my.png';
+    }
+    
+    if (index === 1) {
+      personalArea.classList.add('slide-out-left'); // Slide out Personal Apps
+      pinnedArea.classList.remove('hide', 'slide-out-right');  
+      pinnedArea.classList.add('slide-in-right');  // Slide in Pinned Apps
+
+      setTimeout(() => {
+        personalArea.classList.add('hide');
+        personalArea.classList.remove('slide-out-left', 'slide-in-left');
+      }, 300);
+
+      document.getElementById('my-pin-li-text').innerText = 'Pinned Apps';
+      document.getElementById('personal-apps-no').classList.add('hide');
+      document.getElementById('pinned-apps-no').classList.remove('hide');
+      document.getElementById('my-apps-icon').src = './assets/pin.png';
+    }
+  });
+});

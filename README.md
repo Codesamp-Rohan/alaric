@@ -62,7 +62,7 @@ If you are adding a pear app in **Alaric**, ensure your app's `package.json` is 
 
 **Security:** [hypercore-crypto](https://github.com/holepunchto/hypercore-crypto) - Encryption and cryptographic verification for secure data transmission.
 
-**Designing:** [Figma](https://www.figma.com/design/2DX8bjRL8jlHbOTyzKkaaJ/Alaric?node-id=29-2&t=AKwMjqiOuJJKrF84-1) - Designed the Icon, Wireframe and Layout of Alaric.
+**Designing:** [Figma](https://www.figma.com/design/2DX8bjRL8jlHbOTyzKkaaJ/Alaric?node-id=56-2&t=Dj9uzMBfh6jnuq92-1) - Designed the Icon, Wireframe and Layout of Alaric.
 
 
 

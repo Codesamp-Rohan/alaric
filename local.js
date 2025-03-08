@@ -3,22 +3,24 @@ import path from 'path';
 import os from 'os';
 import { createRequire } from 'module';
 import { notification } from './notification';
+import { getPearBinaryPath, setPearBinaryPath } from './config';
+import { ENV } from './env';
 const require = createRequire(import.meta.url);
 const { exec } = require('child_process');
 
-export let permitsPath;
-export let pearBinaryPath;
+let permitsPath;
+let pearBinaryPath;
 let pearAppType;
 
 if (os.platform() === 'darwin') {
-  permitsPath = path.join(os.homedir(), 'Library', 'Application Support', 'pear', 'permits.json');
-  pearBinaryPath = path.join(os.homedir(), 'Library', 'Application Support', 'pear', 'bin', 'pear');
+  permitsPath = path.resolve(os.homedir(), ENV.darwinPermitsPath);
+  setPearBinaryPath(path.resolve(os.homedir(), ENV.darwinBinaryPath));
 } else if (os.platform() === 'linux') {
-  permitsPath = path.join(os.homedir(), '.config', 'pear', 'permits.json');
-  pearBinaryPath = 'pear';
+  permitsPath = path.resolve(os.homedir(), ENV.linuxPermitsPath);
+  setPearBinaryPath(ENV.linuxBinaryPath);
 } else if (os.platform() === 'win32') {
-  permitsPath = path.join(os.homedir(), 'AppData', 'Roaming', 'pear', 'permits.json');
-  pearBinaryPath = path.join(os.homedir(), 'AppData', 'Roaming', 'pear', 'bin', 'pear');
+  permitsPath = path.resolve(os.homedir(), ENV.windowPermitsPath);
+  setPearBinaryPath(path.resolve(os.homedir(), ENV.windowBinaryPath));
 } else {
   console.error('Unsupported OS');
   permitsPath = null;
@@ -45,6 +47,7 @@ document.addEventListener('click', (event) => {
   }
 });
 
+pearBinaryPath = getPearBinaryPath();
 
 function getPearInfo(pearId) {
   return new Promise((resolve) => {
@@ -195,10 +198,10 @@ async function loadPermits() {
               <div class="list--side--menu">
                <button class="slide-menu" style="background: transparent; border: 0; width: 30px; height: 30px;"><img style="width: 12px;" src="./assets/arrow.png" class="list--icon icon" /></button>
                <button class="run-local-cmd" data-tooltip="Run the Pear app" style="${pear.pearType === 'desktop' ? `` : `opacity: 0; pointer-events: none;`}background: transparent; border: 0; width: 30px; height: 30px;">
-                  <img src="./assets/run.png" style="width: 15px;" class="list--icon icon" />
+                  <img src="./assets/run.png" style="width: 15px;" class="icon" />
                   </button>
                 <button class="copy-pearID" data-tooltip="Copy Pear ID" style="background: transparent; border: 0; width: 30px; height: 30px;">
-                <img src="./assets/copy.png" style="width: 15px;" class="list--icon icon" />
+                <img src="./assets/copy.png" style="width: 15px;" class="icon" />
                 </button>
               </div>
               `;
@@ -312,8 +315,8 @@ document.addEventListener('DOMContentLoaded', () => {
   contextMenu.className = 'context-menu';
   contextMenu.innerHTML = `
       <ul>
-          <li id="run-option">Run</li>
-          <li id="copy-option">Copy Pear ID</li>
+          <li id="local-run-option">Run</li>
+          <li id="local-local-copy-option">Copy Pear ID</li>
       </ul>
   `;
   document.body.appendChild(contextMenu);
@@ -341,13 +344,13 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.body.addEventListener('click', (event) => {
-      if (event.target.matches('#run-option')) {
+      if (event.target.matches('#local-run-option')) {
           console.log("Run clicked for:", selectedPearCmd);
           if (selectedPearCmd) runPearApp(selectedPearCmd);
           contextMenu.classList.remove('active');
       }
 
-      if (event.target.matches('#copy-option')) {
+      if (event.target.matches('#local-copy-option')) {
           console.log("Copy clicked for:", selectedPearCmd);
           if (selectedPearCmd) {
               navigator.clipboard.writeText(selectedPearCmd).then(() => {
@@ -385,8 +388,8 @@ const openPopup = (app) => {
       </div>
     </div>
     <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 1rem;">
-      <button class="button" id="run-command-btn" style="padding: 8px 15px; border: none; background:#ac0009; color: #fff; border-radius: 5px; cursor: pointer; margin-top: 0; ">Run</button>
-      <button class="button" id="copy-command-btn" style="padding: 8px 15px; border: none; background: #00236e; color: #fff; border-radius: 5px; cursor: pointer; margin-top: 0; ">Copy</button>
+      <button class="button" id="run-command-btn" style="padding: 8px 15px; border: none; background:#ac0009; color: #fff; border-radius: 5px; cursor: pointer; margin-top: 0; box-shadow: inset 0 0 11px #FFF">Run</button>
+      <button class="button" id="copy-command-btn" style="padding: 8px 15px; border: none; background: #00236e; color: #fff; border-radius: 5px; cursor: pointer; margin-top: 0; box-shadow: inset 0 0 11px #FFF">Copy</button>
       <button class="button" style="margin-top: 0; width: fit-content;" id="close-global--popUp">Close</button>
     </div>
   `;

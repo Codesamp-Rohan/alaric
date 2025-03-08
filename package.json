@@ -18,17 +18,7 @@
       "admin=hello"
     ],
     "links": [
-      "https://*","http://*","127.0.0.1","localhost",
-      "https://api.qrserver.com",
-      "https://6f58d87b0d.d.voltageapp.io",
-      "https://alaric-crypto.t.voltageapp.io",
-      "https://alaric-crypto.m.voltageapp.io",
-      "https://cdnjs.cloudflare.com",
-      "https://api.voltage.cloud",
-      "https://cdn.jsdelivr.net/npm/xterm/css/xterm.css",
-      "https://api.coingecko.com",
-      "wss://stream.binance.com",
-      "https://api.binance.com"
+      "https://*","http://*","127.0.0.1","localhost"
     ]
   },
   "type": "module",

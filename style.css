@@ -138,13 +138,13 @@ body > h1:nth-of-ty(1) {
   }
   .premium-badge{
     position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 20px;
-    height: 20px;
+    top: -10px;
+    right: -10px;
+    width: 40px;
+    height: 40px;
     z-index: 900;
   }
-  #local-apps-no, #global-apps-no, #pinned-apps-no, #personal-apps-no, #onlyGames-apps-no, #rooms-apps-no, #admin-apps-no, #global-rooms-no, #premium-apps-no{
+  #local-apps-no, #global-apps-no, #myPin-apps-no, #onlyGames-apps-no, #rooms-apps-no, #admin-apps-no, #global-rooms-no, #premium-apps-no{
     position: absolute;
     right: 14px;
     color: #666;
@@ -152,6 +152,11 @@ body > h1:nth-of-ty(1) {
     font-size: 10px;
     top: 50%;
     transform: translateY(-50%);
+  }
+  #personal-apps-no, #pinned-apps-no{
+    color: #666;
+    font-weight: 900;
+    font-size: 10px;
   }
   li:hover{
     /* background-color: #48484824; */
@@ -276,6 +281,11 @@ body > h1:nth-of-ty(1) {
   button{
     cursor: pointer;
   }
+  .reload--app{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
   .list--area{
     display: flex;
     flex-direction: column;
@@ -285,7 +295,7 @@ body > h1:nth-of-ty(1) {
     justify-content: space-between;
     overflow-x: hidden;
   }
-  .personal--list--area{
+  .personal--list--area, .pinned--list--area{
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
@@ -314,7 +324,7 @@ body > h1:nth-of-ty(1) {
     margin-top: 0;
   }
 
-  .app-item, .room-item{
+  .app-item, .room-item, .premium-app-item{
     width: 100%;
     transition: 300ms;
     overflow: hidden;
@@ -574,6 +584,7 @@ svg {
   left: 0;
 }
 .notification{
+  min-width: 35%;
   padding: 10px;
   border-radius: 10px;
   z-index: 1000;
@@ -581,8 +592,10 @@ svg {
   bottom: 10px;
   right: -140%;
   transition: 600ms;
-  color: #fff;
-  background-color: #000;
+  color: #000;
+  background-color: #eee;
+  font-weight: 900;
+  box-shadow: 0 0 10px #aaa;
 }
 .notification-active{
   right: 10px;
@@ -590,7 +603,10 @@ svg {
 .notification-message{
   font-size: 10px;
   font-weight: 900;
-  color: #fff;
+  color: #000;
+}
+#premium-msg{
+  margin: 2rem 1rem;
 }
 #add-holesail-details{
   position: fixed;
@@ -643,7 +659,6 @@ svg {
   background-color: #000000;
   color: #fff;
   border: 0;
-  box-shadow: inset 0 0 10px #bbb;
   display: flex;
   gap: 3px;
   align-items: center;
@@ -1040,7 +1055,7 @@ div:where(.swal2-container) div:where(.swal2-actions){
   background: white;
   border: 1px solid #ccc;
   box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
-  border-radius: 5px;
+  border-radius: 14px;
   display: none;
   z-index: 1000;
 }
@@ -1053,16 +1068,26 @@ div:where(.swal2-container) div:where(.swal2-actions){
   list-style: none;
   margin: 0;
   padding: 5px 0;
+  gap: 0;
 }
 
 .context-menu ul li {
-  padding: 10px 20px;
+  padding: 6px 5px;
   cursor: pointer;
   font-size: 14px;
+  margin-inline: 5px;
+  font-weight: 600;
+  color: #444
 }
 
 .context-menu ul li:hover {
-  background: #f0f0f0;
+  background: #f8f5f5;
+}
+.context-menu .icon{
+  width: 16px;
+  filter: invert(0) !important;
+  background-color: transparent !important;
+  border-radius: 0 !important;
 }
 
 .hidden { display: none; }
@@ -1142,4 +1167,64 @@ div:where(.swal2-container) div:where(.swal2-actions){
     transform: rotate(180deg);
     z-index: 999;
   }
+}
+
+/* Slide In from Left */
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+.slide-in-left {
+  animation: slideInLeft 0.3s ease-out forwards;
+}
+
+/* Slide In from Right */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+.slide-in-right {
+  animation: slideInRight 0.3s ease-out forwards;
+}
+
+/* Slide Out to Left */
+@keyframes slideOutLeft {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+.slide-out-left {
+  animation: slideOutLeft 0.3s ease-in forwards;
+}
+
+/* Slide Out to Right */
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+.slide-out-right {
+  animation: slideOutRight 0.3s ease-in forwards;
 }

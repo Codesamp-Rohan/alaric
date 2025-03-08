@@ -1,4 +1,5 @@
 import Swal from "sweetalert2";
+import { ENV } from './env.js';
 
 document.getElementById("payment--form").addEventListener("click", () => displayInvoice({ name: "direct_payment", price: 5000 }));
 
@@ -6,14 +7,14 @@ async function generateInvoice(price) {
     try {
         Swal.fire({ title: "Generating Invoice...", text: "Please wait...", allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
-        const apiEndpoint = "https://alaric-crypto.m.voltageapp.io:8080/v1/invoices";
+        const apiEndpoint = ENV.voltageAPIendpoint;
         const requestData = { value: price, memo: "Alaric App Lightning Payment", expiry: 3600, private: true };
 
         const response = await fetch(apiEndpoint, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Grpc-Metadata-macaroon": "0201036c6e6402f801030a109efb8ed5af782de76430a120d22cc8011201301a160a0761646472657373120472656164120577726974651a130a04696e666f120472656164120577726974651a170a08696e766f69636573120472656164120577726974651a210a086d616361726f6f6e120867656e6572617465120472656164120577726974651a160a076d657373616765120472656164120577726974651a170a086f6666636861696e120472656164120577726974651a160a076f6e636861696e120472656164120577726974651a140a057065657273120472656164120577726974651a180a067369676e6572120867656e657261746512047265616400000620c14d9f526ee69bb72e2bfc6b538ec4e7f1acbebd024464402b16e119c581d5dc"
+                "Grpc-Metadata-macaroon": ENV.endpointMetadataMacaroon,
             },
             body: JSON.stringify(requestData)
         });
@@ -43,7 +44,7 @@ export async function displayInvoice(appData) {
     if (!invoiceData) return;
 
     const { payment_request, r_hash } = invoiceData;
-    const qrCodeImage = `https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=lightning:${payment_request}`;
+    const qrCodeImage = `${ENV.voltageQRCodeAPI}:${payment_request}`;
 
     const showQRPopup = () => {
         Swal.fire({
@@ -68,7 +69,7 @@ export async function displayInvoice(appData) {
 }
 
 async function checkPaymentStatus(r_hash, appName) {
-    const checkEndpoint = `https://alaric-crypto.m.voltageapp.io:8080/v1/invoice/${r_hash}`;
+    const checkEndpoint = `${ENV.checkpointVoltageAPIcheckpoint}/${r_hash}`;
     console.log(checkEndpoint);
     let attempts = 0;
 
@@ -84,7 +85,7 @@ async function checkPaymentStatus(r_hash, appName) {
             const response = await fetch(checkEndpoint, {
                 method: "GET",
                 headers: {
-                    "Grpc-Metadata-macaroon": "0201036c6e6402f801030a109efb8ed5af782de76430a120d22cc8011201301a160a0761646472657373120472656164120577726974651a130a04696e666f120472656164120577726974651a170a08696e766f69636573120472656164120577726974651a210a086d616361726f6f6e120867656e6572617465120472656164120577726974651a160a076d657373616765120472656164120577726974651a170a086f6666636861696e120472656164120577726974651a160a076f6e636861696e120472656164120577726974651a140a057065657273120472656164120577726974651a180a067369676e6572120867656e657261746512047265616400000620c14d9f526ee69bb72e2bfc6b538ec4e7f1acbebd024464402b16e119c581d5dc"
+                    "Grpc-Metadata-macaroon": ENV.metadataMacaroon
                 }
             });
 

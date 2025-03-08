@@ -2,8 +2,8 @@
 <html>
 <head>
   <link rel="stylesheet" href="./style.css">
-  <script type='module' src='./app.js'></script>
   <script type="module" src="./local.js"></script>
+  <script type='module' src='./app.js'></script>
   <script type="module" src="./generateInvoice.js"></script>
   <!-- <script type="module" src="./premium.js"></script> -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -40,8 +40,11 @@
         font-size: 10px;
         color: #777;">apps</p>
         <li><span class="dot dot-hide"></span>
-          <img src="./assets/my.png" class="icon" /><p>My Apps</p>
+          <img src="./assets/my.png" class="icon" id="my-apps-icon" /><p id="my-pin-li-text">My Apps</p>
+          <div style="display: flex; gap: 3px;" id="myPin-apps-no">
           <p id="personal-apps-no">0</p>
+          <p id="pinned-apps-no" class="hide">0</p>
+          </div>
         </li>
         <li><span class="dot dot-hide"></span><img src="./assets/install.png" class="icon" /><p>System Pear Apps</p>
           <p id="local-apps-no">0</p>
@@ -164,11 +167,12 @@
           <p class="page--header">Apps added by You 🫵</p>
           <div style="display: flex; align-items: center; gap: 1rem; height: fit-content; padding: 3px; margin-right: 1rem; border-radius: 7px; position: relative; overflow: hidden;">
             <div id="slider" class="button"></div>
-            <button style="width: 100px; padding: 4px; position: relative; z-index: 1;" class="my-apps-btn" id="my-apps-btn-1">my apps</button>
-            <button style="width: 100px; padding: 4px; position: relative; z-index: 1;" class="my-apps-btn" id="my-apps-btn-2">pinned apps</button>
+            <button data-value="0" style="width: 100px; padding: 4px; position: relative; z-index: 1;" class="my-apps-btn" id="my-apps-btn-1">my apps</button>
+            <button data-value="1" style="width: 100px; padding: 4px; position: relative; z-index: 1;" class="my-apps-btn" id="my-apps-btn-2">pinned apps</button>
           </div>
           </div>
           <div class="personal--list--area" style="overflow: visible !important;"></div>
+          <div class="pinned--list--area hide" style="overflow: visible !important;"></div>
       </section>
       <!-- Installed / Local Apps -->
       <section class="page hide" id="local--page">
@@ -177,7 +181,7 @@
           <div style="display: flex; align-items: center; gap: 10px;">
             <input type="text" style="margin-top: 0;border-radius: 5px;padding: 10px; width: 260px;" id="local--search" placeholder="Search the Local Pears" />
           <!-- <button class="clear-cacheBtn">CLEAR CACHE</button> -->
-          <button class="button reload--app" style="width: fit-content;font-size: 10px;font-weight: 900;margin-top: 0; color: #fff; background-color: #000;border-radius: 5px;">Reload App</button>
+          <button class="button reload--app" style="width: fit-content;font-size: 10px;font-weight: 900;margin-top: 0; color: #fff; background-color: #000;border-radius: 5px;"><img src="./assets/reload.png" style="width: 12px; height: 12px;"/>Reload App</button>
           </div>
           </div>
           <div id="trending--apps-container">
@@ -211,7 +215,7 @@
               <a href="#" id="sortByNewest"><img src="./assets/newest.png" style="width: 10px;" />Newest</a>
             </div>
           </div>         
-          <button class="button reload--app" style="width: fit-content;font-size: 10px;font-weight: 900;margin-top: 0; color: #fff; background-color: #000;border-radius: 5px;">Reload App</button>
+          <button class="button reload--app" style="width: fit-content;font-size: 10px;font-weight: 900;margin-top: 0; color: #fff; background-color: #000;border-radius: 5px;"><img src="./assets/reload.png" style="width: 12px; height: 12px;"/>Reload App</button>
           </div>
           </div>
           <p id="global-msg" class="hide">No Global apps added yet!!!</p>
@@ -232,7 +236,7 @@
               <a href="#" id="sortRoomByNewest"><img src="./assets/newest.png" style="width: 10px;" />Newest</a>
             </div>
           </div>         
-          <button class="button reload--app" style="width: fit-content;font-size: 10px;font-weight: 900;margin-top: 0; color: #fff; background-color: #000;border-radius: 5px;">Reload App</button>
+          <button class="button reload--app" style="width: fit-content;font-size: 10px;font-weight: 900;margin-top: 0; color: #fff; background-color: #000;border-radius: 5px;"><img src="./assets/reload.png" style="width: 12px; height: 12px;"/>Reload App</button>
           </div>
           </div>
           <p id="room-msg" class="hide">No Rooms added yet!!!</p>
@@ -241,7 +245,7 @@
       </section>
       <!-- Premium Apps -->
       <section class="page" id="premium--page">
-        <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999;">
+        <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999;border-radius: 10px; border: 1px solid #eee; background-color: #fff; padding-inline: 10px;">
           <p class="page--header">Premium Apps</p>
           <div style="display: flex; align-items: center; gap: 10px;">
             <input type="text" style="margin-top: 0;border-radius: 5px;padding: 10px; width: 260px;" id="premium--search" placeholder="Search the App" />
@@ -253,7 +257,7 @@
               <a href="#" id="sortByNewest"><img src="./assets/newest.png" style="width: 10px;" />Newest</a>
             </div>
           </div>         
-          <button class="button reload--app" style="width: fit-content;font-size: 10px;font-weight: 900;margin-top: 0; color: #fff; background-color: #000;border-radius: 5px;">Reload App</button>
+          <button class="button reload--app" style="width: fit-content;font-size: 10px;font-weight: 900;margin-top: 0; color: #fff; background-color: #000;border-radius: 5px;"><img src="./assets/reload.png" style="width: 12px; height: 12px;"/>Reload App</button>
           </div>
           </div>
           <p id="premium-msg" class="hide">No Premium apps added yet!!!</p>
