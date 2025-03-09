@@ -52,41 +52,20 @@ const cleanup = async () => {
   process.exit(0);
 };
 
-document.getElementById('sortByName').addEventListener('click', (e) => {
-  e.preventDefault();
-  sortOrder = 'asc';
-  listProducts();
+
+document.querySelectorAll('.sort-button').forEach(button => {
+  button.addEventListener('click', (e) => {
+    e.preventDefault();
+    sortOrder = button.dataset.sort;
+    if (button.dataset.type === 'premium') {
+      listPremiumApps();
+    } else {
+      listProducts();
+    }
+  });
 });
 
-document.getElementById('sortByNewest').addEventListener('click', (e) => {
-  e.preventDefault();
-  sortOrder = 'newest';
-  listProducts();
-});
 
-document.getElementById('sortByOldest').addEventListener('click', (e) => {
-  e.preventDefault();
-  sortOrder = 'oldest';
-  listProducts();
-});
-
-document.getElementById('sortRoomByName').addEventListener('click', (e) => {
-  e.preventDefault();
-  sortOrder = 'asc';
-  listProducts();
-});
-
-document.getElementById('sortRoomByNewest').addEventListener('click', (e) => {
-  e.preventDefault();
-  sortOrder = 'newest';
-  listProducts();
-});
-
-document.getElementById('sortRoomByOldest').addEventListener('click', (e) => {
-  e.preventDefault();
-  sortOrder = 'oldest';
-  listProducts();
-});
 
 const listProducts = async () => {
   await feed.update();
@@ -350,7 +329,6 @@ const runPearCommand = (cmd) => {
 const addProduct = async (product, fromPeer = false) => {
   console.log(product.appType);
   console.log(product.imageUrl);
-
     if (!globalApps.has(product.id)) {
       globalApps.set(product.id, product);
       if (!fromPeer) {
@@ -362,13 +340,6 @@ const addProduct = async (product, fromPeer = false) => {
       listProducts();
       listPremiumApps();
     }
-
-    await Swal.fire({
-      title: 'App Created!',
-      html: `<strong>Type:</strong> ${product.appType} <br>
-             <strong>Command:</strong> ${product.command}`,
-      icon: 'success',
-    });
 };
 
 
@@ -510,6 +481,13 @@ const addApp = async (appName, appType, command, appDescription, imageUrl) => {
     await addProduct(appData);
     addPersonalApp(appData);
   }
+
+  await Swal.fire({
+    title: 'App Created!',
+    html: `<strong>Type:</strong> ${appType} <br>
+           <strong>Command:</strong> ${command}`,
+    icon: 'success',
+  });
 };
 
 document.getElementById('add--app--form').addEventListener('click', async (e) => {
@@ -827,7 +805,18 @@ const listPremiumApps = async () => {
       });
     }
 
-    premiumAppsSection.innerHTML = premiumToDisplay.reverse().map(app => {
+    premiumToDisplay = premiumToDisplay.sort((a, b) => {
+      if (sortOrder === 'asc') {
+        return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
+      } else if (sortOrder === 'newest') {
+        return b.createAt - a.createAt;
+      } else if (sortOrder === 'oldest') {
+        return a.createAt - b.createAt;
+      }
+      return 0;
+    });
+
+    premiumAppsSection.innerHTML = premiumToDisplay.map(app => {
       const name = premiumSearch ? highlightSearchTerm(app.name, premiumSearch) : app.name;
       const cmd = premiumSearch ? highlightSearchTerm(app.cmd, premiumSearch) : app.cmd;
 
@@ -874,7 +863,6 @@ const listPinnedApps = async () => {
   for await (const app of pinAppFeed.createReadStream()) {
     if (!pinApps.has(app.id)) {
       pinApps.set(app.id, app);
-      // console.log(app);
     }
   }
 
@@ -888,7 +876,7 @@ const listPinnedApps = async () => {
   } else {
   pinAppsSection.innerHTML = Array.from(pinApps.values()).reverse()
     .map(app => `
-        <div style="position: relative; cursor: pointer; width: 20%;height: 180px;border-radius: 20px; background-color: #000; box-shadow: 0 0 10px #bbb; box-shadow: 6px 7px 10px #a5a5a5;" class="personal-app-item reveal" data-cmd="${app.cmd}" data-id="${app.id}" id="${app.appId}">
+        <div style="position: relative; cursor: pointer; width: 20%;height: 180px;border-radius: 20px; background-color: #000; box-shadow: 0 0 10px #bbb; box-shadow: 6px 7px 10px #a5a5a5;" class="pinned-app-item reveal" data-cmd="${app.cmd}" data-id="${app.id}" id="${app.appId}">
          ${app.hasOwnProperty('price') && app.price !== false && app.appType === 'premium' ? `<img src="./assets/star.png" class="premium-badge"/>` : ''}
           <div class="personal-list" style="display: flex;flex-direction: column;align-items: center;gap: 10px;position: relative;background-color: #000000;width: 100%;height: 100%;box-shadow: inset 0 0 30px #ddd; border-radius: 20px;">
             <img 
@@ -1021,11 +1009,18 @@ document.addEventListener('DOMContentLoaded', () => {
   let selectedElement = null;
 
   document.addEventListener('contextmenu', (event) => {
-    const targetItem = event.target.closest('.app-item, .room-item');
+    const targetItem = event.target.closest('.app-item, .room-item, .pinned-app-item');
     if (!targetItem) return;
 
     event.preventDefault();
     selectedElement = targetItem;
+
+    const appId = selectedElement.getAttribute('data-id');
+    if (pinApps.has(appId)) {
+      document.getElementById('pin-option').innerHTML = '<img src="./assets/unpin.png" class="icon" />Unpin';
+    } else {
+      document.getElementById('pin-option').innerHTML = '<img src="./assets/pin.png" class="icon" />Pin';
+    }
 
     contextMenu.style.top = `${event.pageY}px`;
     contextMenu.style.left = `${event.pageX}px`;
@@ -1040,15 +1035,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('run-option').addEventListener('click', () => {
     if (selectedElement) {
-      const appId = selectedElement.getAttribute('data-id'); // ✅ Using `data-id`
+      const appId = selectedElement.getAttribute('data-id');
       const app = globalApps.get(appId);
-      if(app.appType === 'pear'){
+      if (app.appType === 'pear') {
         runPearCommand(app.cmd);
-      } else if(app.appType === 'holesail'){
+      } else if (app.appType === 'holesail') {
         console.log('click', app.id, app.cmd);
         openHolesailPopUp(app.id, app.cmd);
-      }  else if (app.appType === 'room') {
-        window.location.href = app.cmd; // ✅ Open the URL in the browser
+      } else if (app.appType === 'room') {
+        window.location.href = app.cmd;
       }
     }
     contextMenu.classList.remove('active');
@@ -1056,7 +1051,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('copy-option').addEventListener('click', () => {
     if (selectedElement) {
-      const pearCmd = selectedElement.dataset.cmd; // ✅ Correctly fetching `data-cmd`
+      const pearCmd = selectedElement.dataset.cmd;
       if (pearCmd) {
         navigator.clipboard.writeText(pearCmd).then(() => {
           notification(`Pear ID "${pearCmd}" copied!`, 'success');
@@ -1068,29 +1063,45 @@ document.addEventListener('DOMContentLoaded', () => {
     contextMenu.classList.remove('active');
   });
 
-  document.getElementById('pin-option').addEventListener('click', () => {
-    if(selectedElement){
-      const appId = selectedElement.getAttribute('data-id');
-      const app = globalApps.get(appId);
+  document.getElementById('pin-option').addEventListener('click', async () => {
+    if (selectedElement) {
+        const appId = selectedElement.getAttribute('data-id');
+        const app = globalApps.get(appId);
 
-      if(app){
-        if(!pinApps.has(app.id)){
-          pinAppFeed.append(app);
-          pinApps.set(app.id, app);
-          notification(`${app.name} pinned successfully.`, 'success');
-          console.log('Pinned App:', app);
-        } else {
-          notification(`${app.name} is already pinned.`, 'info');
+        if (app) {
+            if (pinApps.has(app.id)) {
+                pinApps.delete(app.id);
+
+                // Filter out the unpinned app from pinAppFeed
+                const newPinApps = [];
+                for await (const pinnedApp of pinAppFeed.createReadStream()) {
+                    if (pinnedApp.id !== app.id) {
+                        newPinApps.push(pinnedApp);
+                    }
+                }
+
+                // Rewrite pinAppFeed with updated data
+                await pinAppFeed.truncate(0); // Clear the feed
+                for (const newApp of newPinApps) {
+                    await pinAppFeed.append(newApp);
+                }
+
+                selectedElement.remove();
+                notification(`${app.name} unpinned successfully.`, 'info');
+            } else {
+                await pinAppFeed.append(app);
+                pinApps.set(app.id, app);
+                notification(`${app.name} pinned successfully.`, 'success');
+            }
         }
-      }
     }
     contextMenu.classList.remove('active');
-  })
+    listPinnedApps();
+});
+
 });
 
 listProducts().then(displayTrendingApps);
-
-
 
 const openPopup = (app, type = 'global') => {
   if(app.appType === 'premium') return;

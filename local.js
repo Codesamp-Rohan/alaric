@@ -315,8 +315,8 @@ document.addEventListener('DOMContentLoaded', () => {
   contextMenu.className = 'context-menu';
   contextMenu.innerHTML = `
       <ul>
-          <li id="local-run-option">Run</li>
-          <li id="local-local-copy-option">Copy Pear ID</li>
+          <li id="local-run-option"><img src="./assets/run.png" class="icon" />Run</li>
+          <li id="local-local-copy-option"><img src="./assets/copy.png" class="icon" />Copy Pear ID</li>
       </ul>
   `;
   document.body.appendChild(contextMenu);

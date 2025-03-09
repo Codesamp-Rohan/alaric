@@ -672,9 +672,11 @@ svg {
      z-index: 99;
      border-radius: 0 10px 10px 10px;
      overflow: hidden;
+     border: 0;
+     padding: 3px;
 }
 
-.dropdown-content a {
+.dropdown-content .sort-button {
   color: #fff;
   padding: 10px 13px;
   text-decoration: none;
@@ -683,11 +685,14 @@ svg {
   align-items: center;
   font-size: 10px;
   font-weight: 900;
+  width: 100%;
+  background-color: transparent;
+  border-radius: 7px;
+  border: 0;
 }
 
-.dropdown-content a:hover {
-  background: #222;
-  box-shadow: inset 0 0 10px #bbb;
+.dropdown-content .sort-button:hover {
+  background: #343434;
 }
   .dropdown:hover .dropdown-content {
     display: block;
@@ -780,7 +785,7 @@ td p{
     flex-direction: row;
     justify-content: flex-start;
   }
-  #personal--page .personal--list--area .personal-app-item{
+  #personal--page .personal--list--area .personal-app-item, .pinned-app-item{
     width: fit-content;
     opacity: 1 !important;
     scale: 1 !important;
