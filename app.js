@@ -230,6 +230,7 @@ const listProducts = async () => {
       if (!event.target.closest('.list--side--menu')) {
         const appId = item.getAttribute('data-id');
         const app = globalApps.get(appId);
+        console.log(app);
         if (app) {
           openPopup(app);
         }
@@ -391,6 +392,20 @@ process.on('exit', cleanup);
 const addApp = async (appName, appType, command, appDescription, imageUrl) => {
   if(appType === 'pear'){
     command = `pear run ${command}`;
+    const isCommandExists = Array.from(globalApps.values()).some(app => app.cmd === command);
+
+    if (isCommandExists) {
+      Swal.fire({
+        title: 'Warning!',
+        text: 'This Pear command already exists in global apps!',
+        icon: 'warning',
+        confirmButtonText: 'OK',
+        customClass: {
+          confirmButton: "custom-confirm-button",
+        }
+      });
+      return; // Prevent adding the duplicate command
+    }
   }
 
   if (appType === 'room' && !command.includes('pear://keet/')) {
@@ -941,6 +956,7 @@ const listPersonalApps = async () => {
               `)
               .join('');
             };
+            
           }
 
 const addPersonalApp = async (app) => {
@@ -1002,6 +1018,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <li id="run-option"><img src="./assets/run.png" class="icon" />Run</li>
       <li id="copy-option"><img src="./assets/copy.png" class="icon" />Copy Pear ID</li>
       <li id="pin-option"><img src="./assets/pin.png" class="icon" />Pin</li>
+      <li id="renew-option" style="display: none !important;"><img src="./assets/reload.png" class="icon" style="filter: invert(1) !important;" />Renew</li>
     </ul>
   `;
   document.body.appendChild(contextMenu);
@@ -1009,7 +1026,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let selectedElement = null;
 
   document.addEventListener('contextmenu', (event) => {
-    const targetItem = event.target.closest('.app-item, .room-item, .pinned-app-item');
+    const targetItem = event.target.closest('.app-item, .room-item, .pinned-app-item, .personal-app-item');
     if (!targetItem) return;
 
     event.preventDefault();
@@ -1020,6 +1037,16 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('pin-option').innerHTML = '<img src="./assets/unpin.png" class="icon" />Unpin';
     } else {
       document.getElementById('pin-option').innerHTML = '<img src="./assets/pin.png" class="icon" />Pin';
+    }
+
+    if(personalApps.has(appId)){
+      const app = personalApps.get(appId);
+      const renewOption = document.getElementById('renew-option');
+      if (app.appType === 'room') {
+        renewOption.style.display = 'flex';
+      } else {
+        renewOption.style.display = 'none';
+      }
     }
 
     contextMenu.style.top = `${event.pageY}px`;
@@ -1071,21 +1098,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (app) {
             if (pinApps.has(app.id)) {
                 pinApps.delete(app.id);
-
-                // Filter out the unpinned app from pinAppFeed
                 const newPinApps = [];
                 for await (const pinnedApp of pinAppFeed.createReadStream()) {
                     if (pinnedApp.id !== app.id) {
                         newPinApps.push(pinnedApp);
                     }
                 }
-
-                // Rewrite pinAppFeed with updated data
                 await pinAppFeed.truncate(0); // Clear the feed
                 for (const newApp of newPinApps) {
                     await pinAppFeed.append(newApp);
                 }
-
                 selectedElement.remove();
                 notification(`${app.name} unpinned successfully.`, 'info');
             } else {
@@ -1097,6 +1119,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     contextMenu.classList.remove('active');
     listPinnedApps();
+});
+
+document.getElementById('renew-option').addEventListener('click', async () => {
+  if (selectedElement) {
+    const appId = selectedElement.getAttribute('data-id');
+    const app = personalApps.get(appId);
+    console.log(app);
+
+    if (app && app.appType === 'room') {
+      await renewKeetRoomKey(app);
+    }
+  }
+  contextMenu.classList.remove('active');
 });
 
 });
@@ -1185,3 +1220,88 @@ function formatDate(timestamp) {
     
     return `${day}/${month}/${year}`;
   }
+
+  const renewKeetRoomKey = async (app) => {
+    console.log(`Renewing Keet room key for ${app.name}...`);
+  
+    if (!app || app.appType !== 'room') {
+      console.error('Invalid app for renewal.');
+      notification('Error: Invalid room for renewal.', 'error');
+      return;
+    }
+  
+    // Ask the user for a new Keet room key
+    const { value: newKeetKey } = await Swal.fire({
+      title: 'Renew Keet Room Key',
+      input: 'text',
+      inputPlaceholder: 'Enter new Keet room key (pear://keet/...)',
+      showCancelButton: true,
+      customClass: {
+        input: 'input',
+        confirmButton: "custom-confirm-button",
+        cancelButton: "custom-cancel-button",
+        popup: "font",
+      }
+    });
+  
+    // If user cancels, do nothing
+    if (!newKeetKey) {
+      notification('Room key renewal cancelled.', 'info');
+      return;
+    }
+  
+    // Validate the input (it should start with "pear://keet/")
+    if (!newKeetKey.startsWith('pear://keet/')) {
+      notification('Invalid Keet room key format!', 'error');
+      return;
+    }
+  
+    // Update the app object in personalApps
+    app.cmd = newKeetKey;
+    app.createAt = Date.now(); // Update timestamp
+  
+    console.log(`Updated Keet room key: ${newKeetKey}`);
+  
+    // ✅ Update in personalApps and globalApps
+    personalApps.set(app.id, app);
+    globalApps.set(app.id, app); // Update globally so UI refreshes correctly
+  
+    // ✅ Persist the update in personalAppFeed (store the new key)
+    const newPersonalApps = [];
+    for await (const savedApp of personalAppFeed.createReadStream()) {
+      if (savedApp.id === app.id) {
+        newPersonalApps.push(app); // Add updated app
+      } else {
+        newPersonalApps.push(savedApp); // Keep other apps unchanged
+      }
+    }
+  
+    await personalAppFeed.truncate(0); // Clear the feed
+    for (const updatedApp of newPersonalApps) {
+      await personalAppFeed.append(updatedApp); // Re-save all apps with the updated room
+    }
+  
+    // ✅ Persist update in global Hypercore storage (if needed)
+    const newGlobalApps = [];
+    for await (const savedApp of feed.createReadStream()) {
+      if (savedApp.id === app.id) {
+        newGlobalApps.push(app); // Add updated app
+      } else {
+        newGlobalApps.push(savedApp); // Keep others unchanged
+      }
+    }
+  
+    await feed.truncate(0); // Clear global storage
+    for (const updatedApp of newGlobalApps) {
+      await feed.append(updatedApp); // Save new apps list
+    }
+  
+    // ✅ Notify the user
+    notification(`Keet room key updated globally: ${newKeetKey}`, 'success');
+  
+    // ✅ Refresh UI
+    listPersonalApps();
+    listProducts(); // Refresh global apps list
+  };
+  
+  
