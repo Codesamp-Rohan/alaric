@@ -18,7 +18,7 @@ const COMMON_GLOBAL_KEY = ENV.globalKey;
 
 let pearBinary = getPearBinaryPath();
 console.log(pearBinary);
-let sortOrder = 'newest';
+let sortOrder = 'oldest';
 let feed = new Hypercore(Pear.config.storage + ENV.globalHyperCore, {
     valueEncoding: 'json',
 });

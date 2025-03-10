@@ -95,7 +95,6 @@ body > h1:nth-of-ty(1) {
   .sideMenu{
     width: 25%;
     padding: 1rem;
-    /* background: linear-gradient(to right, #000 0%, #00000059 50%, #00000024 70%, #00000000 100%); */
     border-right: 1px solid #ddd;
     overflow-y: scroll;
   }
