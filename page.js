@@ -37,11 +37,11 @@ document.addEventListener("DOMContentLoaded", () => {
   togglePage(0); // Default to Dashboard
 
   const dashboardLinks = {
-    ".dash-myApps": 1,
-    ".dash-local": 2,
-    ".dash-apps": 3,
-    ".dash-rooms": 4,
-    ".dash-premiumApps": 5
+    ".dash-myApps": 2,
+    ".dash-local": 3,
+    ".dash-apps": 4,
+    ".dash-rooms": 5,
+    ".dash-premiumApps": 6
   };
 
   Object.entries(dashboardLinks).forEach(([selector, index]) => {
@@ -111,4 +111,21 @@ document.querySelectorAll('.my-apps-btn').forEach(button => {
       document.getElementById('my-apps-icon').src = './assets/pin.png';
     }
   });
+});
+
+const roomDetailPopUp = document.querySelector('#room--detail');
+const roomClosePopUp = document.querySelector('#close--room--detail');
+const overlay = document.querySelector('.overlay');
+
+document.querySelector('#detail--btn').addEventListener('click', () => {
+  roomDetailPopUp.classList.toggle('room--active');
+  overlay.classList.remove('hide');
+})
+document.querySelector('#close--room--detail').addEventListener('click', () => {
+  roomDetailPopUp.classList.toggle('room--active');
+  overlay.classList.add('hide');
+})
+overlay.addEventListener('click', () => {
+  roomDetailPopUp.classList.remove('room--active');
+  overlay.classList.add('hide');
 });

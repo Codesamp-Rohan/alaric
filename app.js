@@ -9,16 +9,19 @@ import { notification } from './notification';
 import Swal from 'sweetalert2';
 import { displayInvoice } from './generateInvoice';
 import { getPearBinaryPath } from './config';
-import { ENV } from './env';
+import { ENV, updateEnvPaths } from './env';
 const require = createRequire(import.meta.url);
 const { exec } = require('child_process');
 
 const swarm = new Hyperswarm();
-const COMMON_GLOBAL_KEY = ENV.globalKey;
+let COMMON_GLOBAL_KEY = ENV.globalKey;
+document.querySelector('#presentKey').innerText = `Current Alaric Key - ${COMMON_GLOBAL_KEY}`;
+document.querySelector('#personal--alaric--key').innerText = COMMON_GLOBAL_KEY;
+console.log("This is your present key : ", COMMON_GLOBAL_KEY);
 
 let pearBinary = getPearBinaryPath();
 console.log(pearBinary);
-let sortOrder = 'oldest';
+let sortOrder = 'newest';
 let feed = new Hypercore(Pear.config.storage + ENV.globalHyperCore, {
     valueEncoding: 'json',
 });
@@ -404,7 +407,7 @@ const addApp = async (appName, appType, command, appDescription, imageUrl) => {
           confirmButton: "custom-confirm-button",
         }
       });
-      return; // Prevent adding the duplicate command
+      return;
     }
   }
 
@@ -1304,4 +1307,70 @@ function formatDate(timestamp) {
     listProducts(); // Refresh global apps list
   };
   
+  
+
+  // Private Room Code.
+
+  async function createPrivateRoom() {
+      const topicBuffer = crypto.randomBytes(32);
+      joinRoom(topicBuffer);
+  }
+  
+  async function joinPrivateRoom(joinCode) {
+      const topicBuffer = b4a.from(joinCode, 'hex');
+      joinRoom(topicBuffer);
+  }
+  
+  async function joinRoom(topicBuffer) {
+      const discovery = swarm.join(topicBuffer, { client: true, server: true });
+      await discovery.flushed();
+  
+      const topic = b4a.toString(topicBuffer, 'hex');
+      COMMON_GLOBAL_KEY = topic;
+      updateEnvPaths(COMMON_GLOBAL_KEY);
+      console.log(`Joined Room: ${topic}`);
+  }
+
+  document.querySelector('#private--form').addEventListener('click', async (e) => {
+      e.preventDefault();
+  
+      const { value: action } = await Swal.fire({
+          title: "Create or Join?",
+          text: "Choose an option",
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonText: "Create",
+          showDenyButton: true,
+          denyButtonText: "Join",
+          customClass: {
+              input: 'input',
+              confirmButton: "custom-confirm-button",
+              denyButton: "custom-cancel-button",
+              cancelButton: "custom-cancel-button",
+              popup: "font",
+          }
+      });
+  
+      if (action === true) {
+          await createPrivateRoom();
+      } else if (action === false) {
+          const { value: joinCode } = await Swal.fire({
+              title: "Enter Join Code",
+              input: "text",
+              inputPlaceholder: "Enter the join code",
+              showCancelButton: true,
+              confirmButtonText: "Join",
+              customClass: {
+                  input: 'input',
+                  confirmButton: "custom-confirm-button",
+                  cancelButton: "custom-cancel-button",
+                  popup: "font",
+              }
+          });
+  
+          if (joinCode) {
+              await joinPrivateRoom(joinCode);
+          }
+      }
+  });
   

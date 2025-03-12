@@ -16,6 +16,18 @@
   <div class="blob2"></div>
   <p class="version">Build with ❤️ for and with 🍐</p>
   <main>
+    <div id="room--detail">
+      <button id="close--room--detail">X</button>
+      <h1 style="padding-bottom: 1.4rem;">Alaric.app Key</h1>
+      <div>
+      <p>Your Alaric Key : </p>
+      <p id="personal--alaric--key"></p>
+      </div>
+      <div>
+        <p>Your Global Key : </p>
+        <p id="global--alaric--key">ee504a3ed121313049cc5ca00ed42146d5b75826f126c48ea7696e1f5f263e2b</p>
+        </div>
+    </div>
     <div class="notification">
       <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 10px;">
         <img class="notification-icon" />
@@ -27,13 +39,17 @@
       <button id="close--menu">
         <img src="./assets/close.png"/>
       </button>
+      <div style="display: flex; align-items: center; justify-content: space-between;">
       <div style="display: flex; align-items: center; gap: 4px;"><img src="./assets/alaric.png" style="width: 40px; height: 40px;" /><h1 id="app-heading">Alaric.app</h1></div>
+      <button id="detail--btn"><img style="width: 20px; height: 20px;" src="./assets/seed.png"/></button>
+      </div>
       <div style="display: flex; flex-direction: column; justify-content: space-between; width: 100%; height: 93%;">
       <ul style="margin-top: 2rem; padding-bottom: 1rem;">
         <p style="padding-left: 1rem;
         font-size: 10px;
         color: #777;">dashboard</p>
         <li data-name="dashboard" id="dashboard--menu"><span class="dot dot-hide"></span><img src="./assets/dashboard.png" class="icon" /><p>Dashboard</p></li>
+        <button type="button" id="private--form"><span class="dot dot-hide"></span><img src="./assets/join.png" class="icon" /><p>Private</p></button>
 
         <p style="padding-left: 1rem;
         font-size: 10px;
@@ -60,11 +76,6 @@
           <p>Premium Apps</p>
           <p id="premium-apps-no">0</p>
         </li>
-        <li><span class="dot dot-hide"></span><img src="./assets/game.png" class="icon" />
-          <p>OnlyGames</p>
-          <p id="onlyGames-apps-no">0</p>
-        </li>
-
         <p style="padding-left: 1rem;
         font-size: 10px;
         color: #777;">others</p>
@@ -263,18 +274,8 @@
           <div class="list--area">
           </div>
       </section>
-      <!-- Only Games -->
-      <section class="page" id="onlyGames--page">
-        <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999;">
-          <p class="page--header">Only Games</p>
-          </div>
-          <div class="list--area">
-            <p>Only Games coming SOON!!!</p>
-          </div>
-          <img style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 40px;" src="./assets/jesus.gif" alt="GIF Animation">
-      </section>
       <!-- Live Crypto -->
-      <section class="page" id="onlyGames--page">
+      <section class="page" id="crypto--page">
         <div style="display: flex; flex-direction: row; justify-content: space-between; width: 100%; position: sticky; top: 0; z-index: 999;">
           <p class="page--header">Cryptocurrency Data</p>
           </div>
@@ -312,6 +313,9 @@
             <p><strong>Test Before Adding - </strong>Verify that the app works as expected before adding it</p>
             <p><strong>Respect User Data - </strong>Do not misuse or tamper with other users' data</p>
             <p><strong>Logo size - </strong>should be lower than 500kb</p>
+
+              <p><strong>Global Alaric Key -</strong> ee504a3ed121313049cc5ca00ed42146d5b75826f126c48ea7696e1f5f263e2b</p>
+              <p id="presentKey"><strong>Global Alaric Key -</strong> ee504a3ed121313049cc5ca00ed42146d5b75826f126c48ea7696e1f5f263e2b</p>
           </div>
       </section>
       <!-- About ME -->
